@@ -2,14 +2,27 @@ package com.renefernandez.whenapp;
 
 import java.util.Locale;
 
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.renefernandez.whenapp.presentation.CountryDetailFragment;
+import com.renefernandez.whenapp.presentation.CountryListFragment;
+import com.renefernandez.whenapp.presentation.MyListFragment;
+import com.renefernandez.whenapp.presentation.MyListFragment.ListFragmentItemClickListener;
+import com.renefernandez.whenapp.presentation.MyMapFragment;
+import com.renefernandez.whenapp.presentation.PlaceholderFragment;
+import com.renefernandez.whenapp.constants.*;
+
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,9 +30,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+//import android.app.FragmentManager;
 
 public class MainActivity extends ActionBarActivity implements
-		ActionBar.TabListener {
+		ActionBar.TabListener, ListFragmentItemClickListener{
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -74,6 +88,8 @@ public class MainActivity extends ActionBarActivity implements
 					.setText(mSectionsPagerAdapter.getPageTitle(i))
 					.setTabListener(this));
 		}
+		
+		
 	}
 
 	@Override
@@ -129,6 +145,16 @@ public class MainActivity extends ActionBarActivity implements
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a PlaceholderFragment (defined as a static inner class
 			// below).
+			
+			switch(position){
+			case 1:
+				return MyListFragment.newInstance(position + 1);
+						
+			case 2:
+				return SupportMapFragment.newInstance();
+
+			}		
+			
 			return PlaceholderFragment.newInstance(position + 1);
 		}
 
@@ -153,41 +179,21 @@ public class MainActivity extends ActionBarActivity implements
 		}
 	}
 
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-		/**
-		 * The fragment argument representing the section number for this
-		 * fragment.
-		 */
-		private static final String ARG_SECTION_NUMBER = "section_number";
+	@Override
+	public void onListFragmentItemClick(int position) {
+		 
+        /** Getting the orientation ( Landscape or Portrait ) of the screen */
+        int orientation = getResources().getConfiguration().orientation;
+ 
+		/** Portrait Mode or Square mode */
+		/** Creating an intent object to start the CountryDetailActivity */
+		Intent intent = new Intent(this, CountryDetailActivity.class);
 
-		/**
-		 * Returns a new instance of this fragment for the given section number.
-		 */
-		public static PlaceholderFragment newInstance(int sectionNumber) {
-			PlaceholderFragment fragment = new PlaceholderFragment();
-			Bundle args = new Bundle();
-			args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-			fragment.setArguments(args);
-			return fragment;
-		}
+		/** Setting data ( the clicked item's position ) to this intent */
+		intent.putExtra("position", position);
 
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container,
-					false);
-			TextView textView = (TextView) rootView
-					.findViewById(R.id.section_label);
-			textView.setText(Integer.toString(getArguments().getInt(
-					ARG_SECTION_NUMBER)));
-			return rootView;
-		}
-	}
+		/** Starting the activity by passing the implicit intent */
+		startActivity(intent);
+    }
 
 }
