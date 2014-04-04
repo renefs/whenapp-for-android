@@ -17,4 +17,5 @@
     <string name="title_activity_country_detail">CountryDetailActivity</string>
     <string name="title_activity_country_details">CountryDetailsActivity</string>
     <string name="action_search">Search</string>
+    <string name="action_new">Add New</string>
 </resources>

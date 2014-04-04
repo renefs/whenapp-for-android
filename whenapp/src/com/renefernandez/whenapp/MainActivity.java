@@ -110,14 +110,15 @@ public class MainActivity extends ActionBarActivity implements
 		int id = item.getItemId();
 		// Take appropriate action for each action item click
         switch (item.getItemId()) {
-        case R.id.action_search:
-        	Toast.makeText(this.getBaseContext(), "Search",
-					Toast.LENGTH_SHORT).show();
-            return true;        
+        
         case R.id.action_settings:
         	Toast.makeText(this.getBaseContext(), "Settings",
 					Toast.LENGTH_SHORT).show();
             return true;
+        case R.id.action_new:
+        	Toast.makeText(this.getBaseContext(), "Add New",
+					Toast.LENGTH_SHORT).show();
+        	return true;
         default:
             return super.onOptionsItemSelected(item);
         }
