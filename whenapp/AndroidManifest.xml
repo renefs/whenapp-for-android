@@ -52,6 +52,10 @@
             android:name="com.renefernandez.whenapp.CountryDetailsActivity"
             android:label="@string/title_activity_country_details" >
         </activity>
+        <activity
+            android:name="com.renefernandez.whenapp.AddNewActivity"
+            android:label="@string/title_activity_add_new" >
+        </activity>
     </application>
 
 </manifest>

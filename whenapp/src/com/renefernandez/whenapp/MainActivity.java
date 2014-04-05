@@ -116,6 +116,12 @@ public class MainActivity extends ActionBarActivity implements
 					Toast.LENGTH_SHORT).show();
             return true;
         case R.id.action_new:
+        	
+        	Intent intent = new Intent(this, AddNewActivity.class);
+
+    		/** Starting the activity by passing the implicit intent */
+    		startActivity(intent);
+        	
         	Toast.makeText(this.getBaseContext(), "Add New",
 					Toast.LENGTH_SHORT).show();
         	return true;
@@ -195,7 +201,7 @@ public class MainActivity extends ActionBarActivity implements
 	public void onListFragmentItemClick(int position) {
 		 
         /** Getting the orientation ( Landscape or Portrait ) of the screen */
-        int orientation = getResources().getConfiguration().orientation;
+        //int orientation = getResources().getConfiguration().orientation;
  
 		/** Portrait Mode or Square mode */
 		/** Creating an intent object to start the CountryDetailActivity */

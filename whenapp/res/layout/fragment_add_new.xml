@@ -1,0 +1,124 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/default_app_margin"
+    android:orientation="vertical"
+    android:stretchColumns="1"
+    tools:context="com.renefernandez.whenapp.AddNewActivity"
+    tools:ignore="MergeRootFrame" >
+
+    <TableRow
+        android:id="@+id/tableRow3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/your_moment"
+            android:layout_span="2" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+         >
+
+        <EditText
+            android:id="@+id/editText1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text"
+            android:layout_span="2" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/date"
+            android:layout_span="2" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/editText2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10" android:inputType="date"/>
+
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/set" />
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/time" />
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/editText3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10" android:inputType="time">
+
+            <requestFocus />
+        </EditText>
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/set" />
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <com.google.android.gms.maps.MapView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/mapContainer"
+            android:layout_width="match_parent"
+  			android:layout_height="match_parent"
+            android:apiKey="AIzaSyDpT2u-0gX8jAZ6XlD7m1P7U1_QuOqFElU"
+            android:clickable="true" >
+        </com.google.android.gms.maps.MapView>
+        
+    </TableRow>
+
+</TableLayout>
