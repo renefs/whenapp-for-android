@@ -1,16 +1,11 @@
 package com.renefernandez.whenapp.presentation.activity;
 
 import com.renefernandez.whenapp.R;
-import com.renefernandez.whenapp.R.id;
-import com.renefernandez.whenapp.R.layout;
-import com.renefernandez.whenapp.presentation.fragment.CountryDetailFragment;
+import com.renefernandez.whenapp.presentation.fragment.MomentDetailFragment;
 
-import android.app.Activity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBarActivity;
  
 public class MomentDetailActivity  extends ActionBarActivity{
@@ -19,16 +14,16 @@ public class MomentDetailActivity  extends ActionBarActivity{
         super.onCreate(savedInstanceState);
  
         /** Setting the layout for this activity */
-        setContentView(R.layout.country_details_activity_layout);
+        setContentView(R.layout.moment_detail_activity);
  
         /** Getting the fragment manager for fragment related operations */
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentManager fragmentManager = getFragmentManager();
  
         /** Getting the fragmenttransaction object, which can be used to add, remove or replace a fragment */
         FragmentTransaction fragmentTransacton = fragmentManager.beginTransaction();
  
         /** Instantiating the fragment CountryDetailsFragment */
-        CountryDetailFragment detailsFragment = new CountryDetailFragment();
+        MomentDetailFragment detailsFragment = new MomentDetailFragment();
  
         /** Creating a bundle object to pass the data(the clicked item's position) from the activity to the fragment */
         Bundle b = new Bundle();
@@ -40,7 +35,7 @@ public class MomentDetailActivity  extends ActionBarActivity{
         detailsFragment.setArguments(b);
  
         /** Adding the fragment to the fragment transaction */
-        fragmentTransacton.add(R.id.country_details_fragment_container, detailsFragment);
+        fragmentTransacton.add(R.id.moment_detail_container, detailsFragment);
  
         /** Making this transaction in effect */
         fragmentTransacton.commit();

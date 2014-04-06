@@ -30,6 +30,7 @@ public class MomentListAdapter extends ArrayAdapter<Moment> {
  
 		View rowView = inflater.inflate(R.layout.list_mobile, parent, false);
 		TextView textView = (TextView) rowView.findViewById(R.id.label);
+		TextView textViewDate = (TextView) rowView.findViewById(R.id.textViewDate);
 		//ImageView imageView = (ImageView) rowView.findViewById(R.id.logo);
 		textView.setText(values[position].getTitle());
 		
@@ -49,6 +50,7 @@ public class MomentListAdapter extends ArrayAdapter<Moment> {
 		}
 		img.setBounds( 0, 0, 70, 70 );
 		textView.setCompoundDrawables(img, null, null, null);
+		textViewDate.setText(values[position].getDate().toString());
  
 		return rowView;
 	}
