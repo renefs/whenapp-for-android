@@ -130,7 +130,7 @@
             android:id="@+id/map_fragment"
             android:name="com.google.android.gms.maps.MapFragment"
             android:layout_width="wrap_content"
-            android:layout_height="150dp"
+            android:layout_height="150dip"
             android:layout_weight="1.84"
             android:tag="map_add_new" />
     </LinearLayout>

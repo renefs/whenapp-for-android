@@ -33,20 +33,20 @@ public class MomentListFragment extends ListFragment {
 	 * A callback function, executed when this fragment is attached to an
 	 * activity
 	 */
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		try {
-			/**
-			 * This statement ensures that the hosting activity implements
-			 * ListFragmentItemClickListener
-			 */
-			ifaceItemClickListener = (ListFragmentItemClickListener) activity;
-		} catch (Exception e) {
-			Toast.makeText(activity.getBaseContext(), "Exception",
-					Toast.LENGTH_SHORT).show();
-		}
-	}
+//	@Override
+//	public void onAttach(Activity activity) {
+//		super.onAttach(activity);
+//		try {
+//			
+//			 //This statement ensures that the hosting activity implements
+//			 //ListFragmentItemClickListener
+//			 
+//			ifaceItemClickListener = (ListFragmentItemClickListener) activity;
+//		} catch (Exception e) {
+//			Toast.makeText(activity.getBaseContext(), "Exception",
+//					Toast.LENGTH_SHORT).show();
+//		}
+//	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

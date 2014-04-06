@@ -10,16 +10,20 @@ import com.renefernandez.whenapp.R;
 import com.renefernandez.whenapp.R.id;
 import com.renefernandez.whenapp.R.layout;
 import com.renefernandez.whenapp.R.menu;
+import com.renefernandez.whenapp.business.GPSTracker;
 import com.renefernandez.whenapp.presentation.dialog.DatePickerFragment;
 import com.renefernandez.whenapp.presentation.dialog.TimePickerFragment;
 
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.DialogFragment;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.TimePickerDialog.OnTimeSetListener;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -34,10 +38,12 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 import android.provider.MediaStore;
+import android.provider.Settings;
 
 public class AddNewActivity extends ActionBarActivity implements
-		LocationListener, OnDateSetListener, OnTimeSetListener {
+		 OnDateSetListener, OnTimeSetListener {
 
 	// http://www.vogella.com/tutorials/AndroidGoogleMaps/article.html#maps_markers
 	static final LatLng EUITIO = new LatLng(43.35560534, -5.850938559);
@@ -58,6 +64,8 @@ public class AddNewActivity extends ActionBarActivity implements
 	private Button loadImageButton;
 
 	private String picturePath;
+
+	private GPSTracker gps;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,51 +105,14 @@ public class AddNewActivity extends ActionBarActivity implements
 
 		if (googleMap != null) {
 
-			LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
-			boolean enabled = service
-					.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-			// check if enabled and if not send user to the GSP settings
-			// Better solution would be to display a dialog and suggesting to
-			// go to the settings
-			/*
-			 * if (!enabled) { Intent intent = new
-			 * Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-			 * startActivity(intent); }
-			 */
-
-			service.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,
-					this);
-			Location localizacion = service
-					.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-			LatLng posicion = null;
-
-			if (localizacion != null) {
-
-				posicion = new LatLng(localizacion.getLatitude(),
-						localizacion.getLongitude());
-
-			} else {
-				posicion = EUITIO;
+			gps = new GPSTracker(this);
+			if(gps.canGetLocation()){ // gps enabled
+				
+				setMarkerInPosition(new LatLng(gps.getLatitude(), gps.getLongitude()), true);
+			
+			}else{
+				showSettingsAlert();
 			}
-
-			marker = googleMap.addMarker(new MarkerOptions().position(posicion)
-					.title("Your Location").draggable(true));
-
-			/*
-			 * Marker kiel = googleMap.addMarker(new MarkerOptions()
-			 * .position(KIEL) .title("Kiel") .snippet("Kiel is cool")
-			 * .icon(BitmapDescriptorFactory
-			 * .fromResource(R.drawable.ic_launcher)));
-			 */
-
-			// Move the camera instantly to hamburg with a zoom of 15.
-			googleMap.moveCamera(CameraUpdateFactory
-					.newLatLngZoom(posicion, 17));
-
-			// Zoom in, animating the camera.
-			googleMap.animateCamera(CameraUpdateFactory.zoomTo(17), 2000, null);
 
 		}
 
@@ -151,18 +122,18 @@ public class AddNewActivity extends ActionBarActivity implements
 		// }
 	}
 
-	public void onStart() {
+	protected void onResume() {
+		super.onResume();
 
-		super.onStart();
+		Log.d("rene", "AddNewActivity onResume");
+		if (gps != null)
+			gps.stopUsingGPS();
+	}
 
-		Log.e("AddNewActivity", "OnStart");
-
-		// SupportMapFragment mapFragment = (SupportMapFragment)
-		// getSupportFragmentManager().findFragmentByTag("map_add_new");
-
-		/*
-		 * if(mapFragment==null) Log.e("AddNewActivity", "MAPFRAGMENT ES NULL");
-		 */
+	protected void onPause() {
+		super.onPause();
+		if (gps != null)
+			gps.stopUsingGPS();
 	}
 
 	@Override
@@ -185,29 +156,7 @@ public class AddNewActivity extends ActionBarActivity implements
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	public void onLocationChanged(Location arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onProviderDisabled(String arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onProviderEnabled(String arg0) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-		// TODO Auto-generated method stub
-
-	}
+	
 
 	/**
 	 * A placeholder fragment containing a simple view.
@@ -275,17 +224,77 @@ public class AddNewActivity extends ActionBarActivity implements
 	}
 
 	@Override
-	public void onSaveInstanceState(Bundle b){
+	public void onSaveInstanceState(Bundle b) {
 		b.putString("image", picturePath);
 	}
-	
+
 	@Override
 	public void onRestoreInstanceState(Bundle b) {
 		// you need to handle NullPionterException here.
-		//Log.v("RESTORE", "PicturePath: " + picturePath);
+		// Log.v("RESTORE", "PicturePath: " + picturePath);
 		if (b.getString("image") != null)
-			imageView.setImageBitmap(BitmapFactory.decodeFile(b.getString("image")));
-			picturePath = b.getString("image");
+			imageView.setImageBitmap(BitmapFactory.decodeFile(b
+					.getString("image")));
+		picturePath = b.getString("image");
+	}
+
+	public void showSettingsAlert() {
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+		// Setting Dialog Title
+		alertDialog.setTitle("GPS is settings");
+
+		// Setting Dialog Message
+		alertDialog
+				.setMessage("GPS is not enabled. Do you want to go to settings menu?");
+
+		// Setting Icon to Dialog
+		// alertDialog.setIcon(R.drawable.delete);
+
+		// On pressing Settings button
+		alertDialog.setPositiveButton("Settings",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						Intent intent = new Intent(
+								Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+						startActivity(intent);
+					}
+				});
+
+		// on pressing cancel button
+		alertDialog.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+						setMarkerInPosition(EUITIO, true);
+					}
+				});
+
+		// Showing Alert Message
+		alertDialog.show();
+	}
+
+	private void setMarkerInPosition(LatLng position, boolean withZoom) {
+
+		if (marker == null) {
+			marker = googleMap.addMarker(new MarkerOptions().position(position)
+					.title("Your Location").draggable(true));
+		} else {
+			marker.setPosition(position);
+		}
+
+		if (withZoom == true) {
+
+			// Move the camera instantly to hamburg with a zoom of
+			// 15.
+			googleMap.moveCamera(CameraUpdateFactory
+					.newLatLngZoom(position, 17));
+
+			// Zoom in, animating the camera.
+			googleMap.animateCamera(CameraUpdateFactory.zoomTo(17), 2000, null);
+
+		}
+
 	}
 
 }
