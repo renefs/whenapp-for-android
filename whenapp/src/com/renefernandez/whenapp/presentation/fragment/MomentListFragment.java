@@ -1,9 +1,12 @@
 package com.renefernandez.whenapp.presentation.fragment;
 
 import com.renefernandez.whenapp.constants.Constants;
-import com.renefernandez.whenapp.constants.Country;
+import com.renefernandez.whenapp.constants.TestData;
+import com.renefernandez.whenapp.model.Moment;
+import com.renefernandez.whenapp.presentation.activity.MomentDetailActivity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -13,7 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MyListFragment extends ListFragment {
+public class MomentListFragment extends ListFragment {
 
 	ListFragmentItemClickListener ifaceItemClickListener;
 
@@ -49,13 +52,15 @@ public class MyListFragment extends ListFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		/** Data source for the ListFragment */
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+		/// Data source for the ListFragment
+		/*ArrayAdapter<Moment> adapter = new ArrayAdapter<Moment>(
 				inflater.getContext(), android.R.layout.simple_list_item_1,
-				Country.name);
+				TestData.getTestMoments());
 
-		/** Setting the data source to the ListFragment */
-		setListAdapter(adapter);
+		// Setting the data source to the ListFragment
+		setListAdapter(adapter);*/
+		
+		setListAdapter(new MomentListAdapter(this.getActivity(), TestData.getTestMoments()));
 
 		return super.onCreateView(inflater, container, savedInstanceState);
 	}
@@ -67,15 +72,28 @@ public class MyListFragment extends ListFragment {
 		 * Invokes the implementation of the method onListFragmentItemClick in
 		 * the hosting activity
 		 */
-		ifaceItemClickListener.onListFragmentItemClick(position);
+		//ifaceItemClickListener.onListFragmentItemClick(position);
+		
+		/** Getting the orientation ( Landscape or Portrait ) of the screen */
+        //int orientation = getResources().getConfiguration().orientation;
+ 
+		/** Portrait Mode or Square mode */
+		/** Creating an intent object to start the CountryDetailActivity */
+		Intent intent = new Intent(this.getActivity(), MomentDetailActivity.class);
+
+		/** Setting data ( the clicked item's position ) to this intent */
+		intent.putExtra("position", position);
+
+		/** Starting the activity by passing the implicit intent */
+		startActivity(intent);
 
 	}
 
 	/**
 	 * Returns a new instance of this fragment for the given section number.
 	 */
-	public static MyListFragment newInstance(int sectionNumber) {
-		MyListFragment fragment = new MyListFragment();
+	public static MomentListFragment newInstance(int sectionNumber) {
+		MomentListFragment fragment = new MomentListFragment();
 		Bundle args = new Bundle();
 		args.putInt(Constants.ARG_SECTION_NUMBER, sectionNumber);
 		fragment.setArguments(args);

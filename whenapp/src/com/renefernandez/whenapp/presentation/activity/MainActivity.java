@@ -1,17 +1,13 @@
-package com.renefernandez.whenapp;
+package com.renefernandez.whenapp.presentation.activity;
 
 import java.util.Locale;
 
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.renefernandez.whenapp.presentation.activity.AddNewActivity;
-import com.renefernandez.whenapp.presentation.activity.CountryDetailActivity;
-import com.renefernandez.whenapp.presentation.fragment.CountryDetailFragment;
-import com.renefernandez.whenapp.presentation.fragment.MyListFragment;
-import com.renefernandez.whenapp.presentation.fragment.MyMapFragment;
+import com.renefernandez.whenapp.R;
+import com.renefernandez.whenapp.presentation.fragment.MomentListFragment;
+import com.renefernandez.whenapp.presentation.fragment.MomentsMapFragment;
 import com.renefernandez.whenapp.presentation.fragment.PlaceholderFragment;
-import com.renefernandez.whenapp.presentation.fragment.MyListFragment.ListFragmentItemClickListener;
-import com.renefernandez.whenapp.constants.*;
+import com.renefernandez.whenapp.presentation.fragment.MomentListFragment.ListFragmentItemClickListener;
 
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -20,23 +16,17 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+
 //import android.app.FragmentManager;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements
-		ActionBar.TabListener, ListFragmentItemClickListener{
+		ActionBar.TabListener/*, ListFragmentItemClickListener*/{
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -111,7 +101,7 @@ public class MainActivity extends ActionBarActivity implements
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		// Take appropriate action for each action item click
-        switch (item.getItemId()) {
+        switch (id) {
         
         case R.id.action_settings:
         	Toast.makeText(this.getBaseContext(), "Settings",
@@ -168,10 +158,10 @@ public class MainActivity extends ActionBarActivity implements
 			
 			switch(position){
 			case 1:
-				return MyListFragment.newInstance(position + 1);
+				return MomentListFragment.newInstance(position + 1);
 						
 			case 2:
-				return SupportMapFragment.newInstance();
+				return MomentsMapFragment.newInstance(position + 1);
 
 			}		
 			
@@ -199,21 +189,21 @@ public class MainActivity extends ActionBarActivity implements
 		}
 	}
 
-	@Override
-	public void onListFragmentItemClick(int position) {
-		 
-        /** Getting the orientation ( Landscape or Portrait ) of the screen */
-        //int orientation = getResources().getConfiguration().orientation;
- 
-		/** Portrait Mode or Square mode */
-		/** Creating an intent object to start the CountryDetailActivity */
-		Intent intent = new Intent(this, CountryDetailActivity.class);
-
-		/** Setting data ( the clicked item's position ) to this intent */
-		intent.putExtra("position", position);
-
-		/** Starting the activity by passing the implicit intent */
-		startActivity(intent);
-    }
+//	@Override
+//	public void onListFragmentItemClick(int position) {
+//		 
+//        // Getting the orientation ( Landscape or Portrait ) of the screen
+//        //int orientation = getResources().getConfiguration().orientation;
+// 
+//		// Portrait Mode or Square mode */
+//		// Creating an intent object to start the CountryDetailActivity
+//		Intent intent = new Intent(this, CountryDetailActivity.class);
+//
+//		// Setting data ( the clicked item's position ) to this intent
+//		intent.putExtra("position", position);
+//
+//		// Starting the activity by passing the implicit intent
+//		startActivity(intent);
+//    }
 
 }

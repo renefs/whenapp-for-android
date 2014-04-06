@@ -36,7 +36,7 @@
             android:value="AIzaSyDpT2u-0gX8jAZ6XlD7m1P7U1_QuOqFElU" />
 
         <activity
-            android:name="com.renefernandez.whenapp.MainActivity"
+            android:name="com.renefernandez.whenapp.presentation.activity.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,7 +45,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.renefernandez.whenapp.presentation.activity.CountryDetailActivity"
+            android:name="com.renefernandez.whenapp.presentation.activity.MomentDetailActivity"
             android:label="@string/title_activity_list" >
         </activity>
         <activity

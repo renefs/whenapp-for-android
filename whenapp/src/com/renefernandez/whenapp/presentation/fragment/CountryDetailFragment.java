@@ -1,7 +1,7 @@
 package com.renefernandez.whenapp.presentation.fragment;
 
 import com.renefernandez.whenapp.R;
-import com.renefernandez.whenapp.constants.Country;
+import com.renefernandez.whenapp.constants.TestData;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -28,7 +28,7 @@ public class CountryDetailFragment extends Fragment {
         /** Getting the clicked item's position and setting corresponding details in the textview of the detailed fragment */
         
         
-        tv.setText("Details of " + Country.name[b.getInt("position")]);
+        tv.setText("Details of " + TestData.getTestMoments()[b.getInt("position")].getTitle());
  
         return v;
     }
