@@ -1,6 +1,9 @@
-package com.renefernandez.whenapp;
+package com.renefernandez.whenapp.presentation.activity;
 
-import com.renefernandez.whenapp.presentation.CountryDetailFragment;
+import com.renefernandez.whenapp.R;
+import com.renefernandez.whenapp.R.id;
+import com.renefernandez.whenapp.R.layout;
+import com.renefernandez.whenapp.presentation.fragment.CountryDetailFragment;
 
 import android.app.Activity;
 import android.support.v4.app.FragmentManager;

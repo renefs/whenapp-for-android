@@ -1,4 +1,4 @@
-package com.renefernandez.whenapp.presentation;
+package com.renefernandez.whenapp.presentation.fragment;
 
 import java.util.ArrayList;
 import java.util.List;

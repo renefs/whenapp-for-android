@@ -16,7 +16,7 @@
  
     <fragment
         android:id="@+id/fragment2"
-        android:name="com.renefernandez.whenapp.presentation.CountryDetailFragment"
+        android:name="com.renefernandez.whenapp.presentation.fragment.CountryDetailFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1" />

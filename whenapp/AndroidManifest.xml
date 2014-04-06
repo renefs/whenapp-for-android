@@ -45,7 +45,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.renefernandez.whenapp.CountryDetailActivity"
+            android:name="com.renefernandez.whenapp.presentation.activity.CountryDetailActivity"
             android:label="@string/title_activity_list" >
         </activity>
         <activity
@@ -53,7 +53,7 @@
             android:label="@string/title_activity_country_details" >
         </activity>
         <activity
-            android:name="com.renefernandez.whenapp.AddNewActivity"
+            android:name="com.renefernandez.whenapp.presentation.activity.AddNewActivity"
             android:label="@string/title_activity_add_new" >
         </activity>
     </application>

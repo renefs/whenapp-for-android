@@ -1,4 +1,4 @@
-package com.renefernandez.whenapp;
+package com.renefernandez.whenapp.presentation.activity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -6,13 +6,16 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.renefernandez.whenapp.R;
+import com.renefernandez.whenapp.R.id;
+import com.renefernandez.whenapp.R.layout;
+import com.renefernandez.whenapp.R.menu;
 import com.renefernandez.whenapp.presentation.dialog.DatePickerFragment;
 import com.renefernandez.whenapp.presentation.dialog.TimePickerFragment;
 
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.DialogFragment;
 import android.app.DatePickerDialog.OnDateSetListener;
-
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Intent;
 import android.database.Cursor;
@@ -23,17 +26,14 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TimePicker;
-
 import android.provider.MediaStore;
 
 public class AddNewActivity extends ActionBarActivity implements

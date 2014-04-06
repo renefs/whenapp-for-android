@@ -1,4 +1,4 @@
-package com.renefernandez.whenapp.presentation;
+package com.renefernandez.whenapp.presentation.fragment;
 
 import com.renefernandez.whenapp.R;
 import com.renefernandez.whenapp.constants.Country;

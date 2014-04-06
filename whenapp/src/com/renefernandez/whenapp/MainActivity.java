@@ -4,11 +4,13 @@ import java.util.Locale;
 
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.renefernandez.whenapp.presentation.CountryDetailFragment;
-import com.renefernandez.whenapp.presentation.MyListFragment;
-import com.renefernandez.whenapp.presentation.MyListFragment.ListFragmentItemClickListener;
-import com.renefernandez.whenapp.presentation.MyMapFragment;
-import com.renefernandez.whenapp.presentation.PlaceholderFragment;
+import com.renefernandez.whenapp.presentation.activity.AddNewActivity;
+import com.renefernandez.whenapp.presentation.activity.CountryDetailActivity;
+import com.renefernandez.whenapp.presentation.fragment.CountryDetailFragment;
+import com.renefernandez.whenapp.presentation.fragment.MyListFragment;
+import com.renefernandez.whenapp.presentation.fragment.MyMapFragment;
+import com.renefernandez.whenapp.presentation.fragment.PlaceholderFragment;
+import com.renefernandez.whenapp.presentation.fragment.MyListFragment.ListFragmentItemClickListener;
 import com.renefernandez.whenapp.constants.*;
 
 import android.support.v7.app.ActionBarActivity;

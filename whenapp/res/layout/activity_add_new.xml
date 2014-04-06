@@ -6,7 +6,7 @@
     android:layout_margin="@dimen/default_app_margin"
     android:orientation="vertical"
     android:stretchColumns="1"
-    tools:context="com.renefernandez.whenapp.AddNewActivity"
+    tools:context="com.renefernandez.whenapp.presentation.activity.AddNewActivity"
     tools:ignore="MergeRootFrame" >
 
     <LinearLayout
