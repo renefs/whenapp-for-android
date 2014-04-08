@@ -197,12 +197,12 @@ public class MomentDetailFragment extends Fragment {
 		if (googleMap != null) {
 
 			googleMap.addMarker(new MarkerOptions()
-					.position(moment.getCoordinates()).title(moment.getTitle())
+					.position(new LatLng(moment.getLatitude(), moment.getLongitude())).title(moment.getTitle())
 					.draggable(true));
 
 			// Move the camera instantly to hamburg with a zoom of 15.
 			googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-					moment.getCoordinates(), 14));
+					new LatLng(moment.getLatitude(), moment.getLongitude()), 14));
 
 			// Zoom in, animating the camera.
 			googleMap.animateCamera(CameraUpdateFactory.zoomTo(14), 2000, null);
