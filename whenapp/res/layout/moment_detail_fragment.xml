@@ -1,39 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:id="@+id/moment_detail_main"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1.11"
-        android:contentDescription="@string/detail_image"
-        android:scaleType="fitCenter"
-        android:src="@drawable/common_signin_btn_text_normal_dark" />
-    
-    <TextView 
-        android:id="@+id/country_details"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:layout_gravity="center"
-        android:textColor="@color/blue"
-        />
+    <!-- <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1.5" >
 
-    <TextView
-        android:id="@+id/textViewDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.30" />
-    
-    <fragment
-            android:id="@+id/map_fragment"
-            android:name="com.google.android.gms.maps.MapFragment"
-            android:layout_width="wrap_content"
-            android:layout_height="0dip"
-            android:layout_weight="1.84"
-            android:tag="map_moment_detail" />
-    
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/detail_image"
+            android:src="@drawable/ph_350x200" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1" >
+        
+        <fragment
+        android:id="@+id/map_fragment"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:tag="map_moment_detail" />
+        
+    </LinearLayout>-->
+
 </LinearLayout>

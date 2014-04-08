@@ -26,7 +26,7 @@ public class TestData {
     	
     	Moment[] moments = new Moment[] {
     			
-    	new Moment("Moment 1", new Date(), new LatLng(43.35560534, -5.850938559)),
+    	new Moment("Moment 1 has a very large text", new Date(), new LatLng(43.35560534, -5.850938559)),
     	new Moment("Moment 2", new Date(), new LatLng(43.36560534, -5.850938559)),
     	new Moment("Moment 3", new Date(), new LatLng(43.37560534, -5.850938559))		
     			

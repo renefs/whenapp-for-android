@@ -1,5 +1,8 @@
 package com.renefernandez.whenapp.presentation.fragment;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import com.renefernandez.whenapp.R;
 import com.renefernandez.whenapp.model.Moment;
 
@@ -29,6 +32,7 @@ public class MomentListAdapter extends ArrayAdapter<Moment> {
 			.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
  
 		View rowView = inflater.inflate(R.layout.list_mobile, parent, false);
+		ImageView imageView = (ImageView) rowView.findViewById(R.id.imageView1);
 		TextView textView = (TextView) rowView.findViewById(R.id.label);
 		TextView textViewDate = (TextView) rowView.findViewById(R.id.textViewDate);
 		//ImageView imageView = (ImageView) rowView.findViewById(R.id.logo);
@@ -48,9 +52,13 @@ public class MomentListAdapter extends ArrayAdapter<Moment> {
 		} else {			
 			img = getContext().getResources().getDrawable( R.drawable.android_logo );			
 		}
-		img.setBounds( 0, 0, 70, 70 );
-		textView.setCompoundDrawables(img, null, null, null);
-		textViewDate.setText(values[position].getDate().toString());
+		img.setBounds( 0, 0, 90, 90 );
+		//textView.setCompoundDrawables(img, null, null, null);
+		imageView.setImageDrawable(img);
+		
+		SimpleDateFormat dt1 = new SimpleDateFormat("MM/dd/yyyy HH:mm",Locale.ENGLISH);
+		
+		textViewDate.setText(dt1.format(values[position].getDate()));
  
 		return rowView;
 	}

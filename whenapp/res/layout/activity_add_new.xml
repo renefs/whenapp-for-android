@@ -1,6 +1,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
+    style="@style/Theme.Whenapp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="@dimen/default_app_margin"
@@ -22,6 +23,7 @@
 
         <EditText
             android:id="@+id/editText1"
+            style="@style/EditTextAppTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -52,11 +54,13 @@
 
             <Button
                 android:id="@+id/button1"
+                style="@style/ButtonAppTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="showDatePickerDialog"
-                android:text="@string/set" />
+                android:text="@string/set_date" />
+
         </LinearLayout>
 
         <TextView
@@ -88,11 +92,13 @@
 
             <Button
                 android:id="@+id/button2"
+                style="@style/ButtonAppTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="showTimePickerDialog"
-                android:text="@string/set" />
+                android:text="@string/set_time" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -111,11 +117,13 @@
 
             <Button
                 android:id="@+id/buttonLoadPicture"
+                style="@style/ButtonAppTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="0"
                 android:text="@string/load_picture" >
+
             </Button>
         </LinearLayout>
 
