@@ -29,7 +29,9 @@ public class MomentDetailActivity  extends ActionBarActivity{
         Bundle b = new Bundle();
  
         /** Setting the data to the bundle object from the Intent*/
-        b.putInt("position", getIntent().getIntExtra("position", 0));
+        //b.putInt("position", getIntent().getIntExtra("position", 0));
+        
+        b.putLong("moment_id", getIntent().getLongExtra("moment_id", 1));
  
         /** Setting the bundle object to the fragment */
         detailsFragment.setArguments(b);

@@ -1,6 +1,7 @@
 package com.renefernandez.whenapp.presentation.fragment;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -14,6 +15,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.renefernandez.whenapp.R;
 import com.renefernandez.whenapp.constants.TestData;
 import com.renefernandez.whenapp.model.Moment;
+import com.renefernandez.whenapp.model.dao.MomentDao;
 
 import android.app.ActionBar.LayoutParams;
 import android.app.Fragment;
@@ -55,30 +57,20 @@ public class MomentDetailFragment extends Fragment {
 		 */
 		v = inflater.inflate(R.layout.moment_detail_fragment, null);
 
-		/*
-		 * if (lay_2_heigth > lay_1_height && lay_2_heigth > (parent_height /
-		 * 2)) {
-		 * 
-		 * lay_1.setLayoutParams(new LinearLayout.LayoutParams(
-		 * LayoutParams.MATCH_PARENT, 0, 1));
-		 * 
-		 * lay_2.getView().setLayoutParams(new LinearLayout.LayoutParams(
-		 * LayoutParams.MATCH_PARENT, 0, 1));
-		 * 
-		 * } else if (lay_2_heigth < (parent_height / 2)) {
-		 * lay_1.setLayoutParams(new LinearLayout.LayoutParams(
-		 * LayoutParams.MATCH_PARENT, (parent_height - lay_2_heigth)));
-		 * 
-		 * }
-		 */
-
 		/**
 		 * Getting the bundle object passed from MainActivity ( in Landscape
 		 * mode ) or from CountryDetailsActivity ( in Portrait Mode )
 		 * */
 		Bundle b = getArguments();
 
-		moment = TestData.getTestMoments()[b.getInt("position")];
+		MomentDao dao = new MomentDao(this.getActivity());
+		//List<Moment> moments = dao.listAll();
+		long momentId = b.getLong("moment_id");
+		
+		Log.v("rene", "moment_id received: "+ momentId);
+		//moment = TestData.getTestMoments()[b.getInt("position")];
+		moment = dao.get(momentId);
+		//dao.
 
 		/** Getting the textview object of the layout to set the details */
 		// TextView textTitle = (TextView) v.findViewById(R.id.country_details);

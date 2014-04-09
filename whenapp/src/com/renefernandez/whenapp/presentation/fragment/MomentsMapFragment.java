@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.renefernandez.whenapp.constants.Constants;
 import com.renefernandez.whenapp.constants.TestData;
 import com.renefernandez.whenapp.model.Moment;
+import com.renefernandez.whenapp.model.dao.MomentDao;
 
 public class MomentsMapFragment extends SupportMapFragment {
 
@@ -27,11 +28,14 @@ public class MomentsMapFragment extends SupportMapFragment {
 		super.onCreate(savedInstanceState);
 
 		Log.v("rene", "MomentsMapFragment: Oncreate");
+		
+		MomentDao dao = new MomentDao(this.getActivity());
+		//List<Moment> moments = dao.listAll();
+		//moment = TestData.getTestMoments()[b.getInt("position")];
 
 		// ArrayList<Parcelable> list =
 		// getArguments().getParcelableArrayList("markers");
-		ArrayList<Moment> list = new ArrayList<Moment>(Arrays.asList(TestData
-				.getTestMoments()));
+		List<Moment> list = dao.listAll();
 
 		// map = this.getMap();
 

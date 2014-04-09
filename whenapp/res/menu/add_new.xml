@@ -4,6 +4,13 @@
     tools:context="com.renefernandez.whenapp.AddNewActivity" >
 
     <item
+        android:id="@+id/action_save"
+        android:orderInCategory="0"
+        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom"
+        android:title="@string/action_save"/>
+    
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"

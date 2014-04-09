@@ -1,14 +1,18 @@
 package com.renefernandez.whenapp.presentation.fragment;
 
+import java.util.List;
+
 import com.renefernandez.whenapp.constants.Constants;
 import com.renefernandez.whenapp.constants.TestData;
 import com.renefernandez.whenapp.model.Moment;
+import com.renefernandez.whenapp.model.dao.MomentDao;
 import com.renefernandez.whenapp.presentation.activity.MomentDetailActivity;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +22,9 @@ import android.widget.Toast;
 
 public class MomentListFragment extends ListFragment {
 
-	ListFragmentItemClickListener ifaceItemClickListener;
+	//private ListFragmentItemClickListener ifaceItemClickListener;
+	
+	private List<Moment> moments;
 
 	/** An interface for defining the callback method */
 	public interface ListFragmentItemClickListener {
@@ -60,7 +66,10 @@ public class MomentListFragment extends ListFragment {
 		// Setting the data source to the ListFragment
 		setListAdapter(adapter);*/
 		
-		setListAdapter(new MomentListAdapter(this.getActivity(), TestData.getTestMoments()));
+		MomentDao dao = new MomentDao(this.getActivity());
+		moments = dao.listAll();
+		
+		setListAdapter(new MomentListAdapter(this.getActivity(), moments.toArray(new Moment[moments.size()])));
 
 		return super.onCreateView(inflater, container, savedInstanceState);
 	}
@@ -81,8 +90,10 @@ public class MomentListFragment extends ListFragment {
 		/** Creating an intent object to start the CountryDetailActivity */
 		Intent intent = new Intent(this.getActivity(), MomentDetailActivity.class);
 
+		Log.v("rene", "Moment ID: "+ moments.get(position).getId());
+		
 		/** Setting data ( the clicked item's position ) to this intent */
-		intent.putExtra("position", position);
+		intent.putExtra("moment_id", moments.get(position).getId());
 
 		/** Starting the activity by passing the implicit intent */
 		startActivity(intent);

@@ -32,4 +32,5 @@
 	<string name="item_image">Item Image</string>
 	<string name="set_date">Set date</string>
 	<string name="set_time">Set time</string>
+	<string name="action_save">Save</string>
 </resources>
