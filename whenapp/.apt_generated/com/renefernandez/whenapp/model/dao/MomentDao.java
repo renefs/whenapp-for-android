@@ -7,6 +7,7 @@ import com.renefernandez.whenapp.model.Moment;
 import com.turbomanage.storm.SQLiteDao;
 import com.turbomanage.storm.types.DateConverter;
 import com.turbomanage.storm.types.LongConverter;
+import com.turbomanage.storm.types.BlobConverter;
 import com.turbomanage.storm.types.DoubleConverter;
 import com.turbomanage.storm.types.StringConverter;
 

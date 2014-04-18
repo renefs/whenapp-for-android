@@ -33,4 +33,9 @@
 	<string name="set_date">Set date</string>
 	<string name="set_time">Set time</string>
 	<string name="action_save">Save</string>
+	<string name="action_share">Share</string>
+	<string name="action_share_twitter">Twitter</string>
+	<string name="action_share_facebook">Facebook</string>
+	<string name="action_share_email">Email</string>
+	<string name="album_name">Whenapp Album</string>
 </resources>

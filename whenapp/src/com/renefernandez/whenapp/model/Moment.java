@@ -1,11 +1,12 @@
 package com.renefernandez.whenapp.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.turbomanage.storm.api.Entity;
 
 @Entity
-public class Moment {
+public class Moment implements Serializable{
 
 	private long id;
 
@@ -13,6 +14,9 @@ public class Moment {
 	private Date date;
 	private Double latitude;
 	private Double longitude;
+	
+	private byte[] image;
+	private byte[] thumbnail;
 
 	public Moment() {
 
@@ -64,6 +68,22 @@ public class Moment {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public byte[] getImage() {
+		return image;
+	}
+
+	public void setImage(byte[] image) {
+		this.image = image;
+	}
+
+	public byte[] getThumbnail() {
+		return thumbnail;
+	}
+
+	public void setThumbnail(byte[] thumbnail) {
+		this.thumbnail = thumbnail;
 	}
 
 }

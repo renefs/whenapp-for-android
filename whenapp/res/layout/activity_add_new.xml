@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     style="@style/Theme.Whenapp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:layout_margin="@dimen/default_app_margin"
     android:orientation="vertical"
     android:stretchColumns="1"
@@ -66,7 +66,7 @@
         <TextView
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginTop="@dimen/default_app_margin"
             android:layout_weight="1"
             android:text="@string/time" />
@@ -115,6 +115,12 @@
 
             </ImageView>
 
+            <VideoView
+                android:id="@+id/videoView1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
             <Button
                 android:id="@+id/buttonLoadPicture"
                 style="@style/ButtonAppTheme"
@@ -139,9 +145,8 @@
         <fragment
             android:id="@+id/map_fragment"
             android:name="com.google.android.gms.maps.MapFragment"
-            android:layout_width="wrap_content"
-            android:layout_height="150dip"
-            android:layout_weight="1.84"
+            android:layout_width="match_parent"
+            android:layout_height="275dp"
             android:tag="map_add_new" />
     </LinearLayout>
 

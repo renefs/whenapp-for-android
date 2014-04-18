@@ -1,8 +1,16 @@
 package com.renefernandez.whenapp.presentation.activity;
 
+import java.io.ByteArrayOutputStream;
+
+import com.renefernandez.whenapp.business.pictures.*;
+
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -14,7 +22,7 @@ import com.renefernandez.whenapp.R;
 import com.renefernandez.whenapp.R.id;
 import com.renefernandez.whenapp.R.layout;
 import com.renefernandez.whenapp.R.menu;
-import com.renefernandez.whenapp.business.GPSTracker;
+import com.renefernandez.whenapp.business.location.GPSTracker;
 import com.renefernandez.whenapp.model.Moment;
 import com.renefernandez.whenapp.model.dao.MomentDao;
 import com.renefernandez.whenapp.presentation.dialog.DatePickerFragment;
@@ -36,7 +44,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,44 +57,57 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.widget.VideoView;
 import android.provider.MediaStore;
 import android.provider.Settings;
 
 public class AddNewActivity extends ActionBarActivity implements
 		OnDateSetListener, OnTimeSetListener {
 
+	//MAP
 	// http://www.vogella.com/tutorials/AndroidGoogleMaps/article.html#maps_markers
-	static final LatLng EUITIO = new LatLng(43.35560534, -5.850938559);
-
-	private static final int MY_DATE_DIALOG_ID = 3;
-	private static int RESULT_LOAD_IMAGE = 1;	
-	private static int REQUEST_IMAGE_CAPTURE = 2;
-
+	static final LatLng EUITIO = new LatLng(43.35560534, -5.850938559);	
 	private GoogleMap googleMap;
 	private Marker marker;
+	private GPSTracker gps;
+	
+	//MEDIA
+	private static final int ACTION_TAKE_PHOTO_B = 1;
+	private static int ACTION_LOAD_IMAGE = 2;
+	private static final int ACTION_TAKE_VIDEO = 3;
 
-	private int hour;
-	private int minute;
+	private static final String BITMAP_STORAGE_KEY = "viewbitmap";
+	private static final String IMAGEVIEW_VISIBILITY_STORAGE_KEY = "imageviewvisibility";
+	
+	private Bitmap mImageBitmap;
 
+	private static final String VIDEO_STORAGE_KEY = "viewvideo";
+	private static final String VIDEOVIEW_VISIBILITY_STORAGE_KEY = "videoviewvisibility";
+	private VideoView mVideoView;
+	private Uri mVideoUri;
+
+	private String mCurrentPhotoPath;
+
+	private static final String JPEG_FILE_PREFIX = "IMG_";
+	private static final String JPEG_FILE_SUFFIX = ".jpg";
+
+	private AlbumStorageDirFactory mAlbumStorageDirFactory = null;
+
+	//Fields
 	private EditText textTitle;
 
 	private EditText textDate;
 	private EditText textTime;
 	private ImageView imageView;
 
-	private Button loadImageButton;
-
-	private String picturePath;
-
-	private GPSTracker gps;
-
+	///////////////////////////////////
+	///// Methods
+	//////////////////////////////////
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_add_new);
-
-		// SupportMapFragment mapFragment = (SupportMapFragment)
-		// getSupportFragmentManager().findFragmentById(R.id.map_fragment);
 
 		MapFragment mapFragment = (MapFragment) getFragmentManager()
 				.findFragmentById(R.id.map_fragment);
@@ -94,23 +117,8 @@ public class AddNewActivity extends ActionBarActivity implements
 		textTime = (EditText) findViewById(R.id.editText3);
 
 		imageView = (ImageView) findViewById(R.id.imgView);
+		mVideoView = (VideoView) findViewById(R.id.videoView1);
 
-		loadImageButton = (Button) findViewById(R.id.buttonLoadPicture);
-
-		//loadImageButton.setOnClickListener(this.onClick(this, which));
-		
-		/*loadImageButton.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-
-				Intent i = new Intent(
-						Intent.ACTION_PICK,
-						android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-				startActivityForResult(i, RESULT_LOAD_IMAGE);
-			}
-		});*/
 
 		if (mapFragment == null)
 			Log.e("AddNewActivity", "MAPFRAGMENT ES NULL");
@@ -130,11 +138,17 @@ public class AddNewActivity extends ActionBarActivity implements
 			}
 
 		}
+		
+		Calendar calendar = Calendar.getInstance(); 
+		this.setDateText(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+		this.setTimeText(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
 
-		// if (savedInstanceState == null) {
-		// getSupportFragmentManager().beginTransaction()
-		// .add(R.id.container, new PlaceholderFragment()).commit();
-		// }
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
+			mAlbumStorageDirFactory = new FroyoAlbumDirFactory();
+		} else {
+			mAlbumStorageDirFactory = new BaseAlbumDirFactory();
+		}
 	}
 
 	protected void onResume() {
@@ -142,7 +156,9 @@ public class AddNewActivity extends ActionBarActivity implements
 
 		Log.d("rene", "AddNewActivity onResume");
 		if (gps != null)
-			gps.stopUsingGPS();
+			if (gps.canGetLocation())
+				setMarkerInPosition(
+						new LatLng(gps.getLatitude(), gps.getLongitude()), true);
 	}
 
 	protected void onPause() {
@@ -187,28 +203,7 @@ public class AddNewActivity extends ActionBarActivity implements
 
 	private void addNewMoment() {
 
-		if (this.textTitle.getText().toString() == null
-				|| this.textTitle.getText().toString().equals("")) {
-			this.displayAlertDialog("Error", "Moment title cannot be empty");
-			return;
-		}
-		if (this.textDate.getText().toString() == null
-				|| this.textDate.getText().toString().equals("")) {
-			this.displayAlertDialog("Error",
-					"Yout must set a date for the moment");
-			return;
-		}
-
-		if (this.textTime.getText().toString() == null
-				|| this.textTime.getText().toString().equals("")) {
-			this.displayAlertDialog("Error",
-					"Yout must set a time for the moment");
-			return;
-		}
-
-		if (this.marker == null) {
-			this.displayAlertDialog("Error",
-					"Yout must set a location for the moment");
+		if(!momentIsValid()){
 			return;
 		}
 
@@ -216,11 +211,11 @@ public class AddNewActivity extends ActionBarActivity implements
 		Double latitude = this.marker.getPosition().latitude;
 		Double longitude = this.marker.getPosition().longitude;
 
-		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy-hh:mm");
+		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy-hh:mm", Locale.US);
 		String dateInString = this.textDate.getText().toString() + "-"
 				+ this.textTime.getText().toString();
-		
-		Date date=null;
+
+		Date date = null;
 		try {
 
 			date = formatter.parse(dateInString);
@@ -230,35 +225,79 @@ public class AddNewActivity extends ActionBarActivity implements
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		
-		if(date==null){
-			this.displayAlertDialog("Error",
-					"The date format was incorrect.");
-			return;
-		}
-			
-		
-		Moment newMoment = new Moment(title,date,latitude,longitude);
 
-		MomentDao dao = new MomentDao(this);
-		
-		long id = dao.insert(newMoment);
-		
-		if(id<0){
-			this.displayAlertDialog("Error",
-					"Moment could not be saved.");
-			Log.e("rene", "Error saving moment in DB: Returned id was "+ id);
+		if (date == null) {
+			this.displayAlertDialog("Error", "The date format was incorrect.");
 			return;
 		}
 		
+		ByteArrayOutputStream bos=new ByteArrayOutputStream();
+		
+		byte[]  img=null;
+		Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath);
+		
+		if(bitmap!=null){
+			Log.v("rene", "Salvando imagen del moment");
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+			img=bos.toByteArray();
+		}else{
+			Log.e("rene", "La imagen es null");
+		}
+		
+		//Insertando
+
+		Moment newMoment = new Moment(title, date, latitude, longitude);
+		if(img!=null){
+			newMoment.setImage(img);
+			Log.v("rene", "Imagen salvada");
+		}
+		MomentDao dao = new MomentDao(this);
+
+		long id = dao.insert(newMoment);
+
+		if (id < 0) {
+			this.displayAlertDialog("Error", "Moment could not be saved.");
+			Log.e("rene", "Error saving moment in DB: Returned id was " + id);
+			return;
+		}
+
 		Intent intent = new Intent(this, MainActivity.class);
 
 		/** Starting the activity by passing the implicit intent */
 		startActivity(intent);
-    	
-    	Toast.makeText(this.getBaseContext(), "Moment was added successfully!",
+
+		Toast.makeText(this.getBaseContext(), "Moment was added successfully!",
 				Toast.LENGTH_SHORT).show();
-					
+
+	}
+
+	private boolean momentIsValid() {
+		//Precondiciones
+		if (this.textTitle.getText().toString() == null
+				|| this.textTitle.getText().toString().equals("")) {
+			this.displayAlertDialog("Error", "Moment title cannot be empty");
+			return false;
+		}
+		if (this.textDate.getText().toString() == null
+				|| this.textDate.getText().toString().equals("")) {
+			this.displayAlertDialog("Error",
+					"Yout must set a date for the moment");
+			return false;
+		}
+
+		if (this.textTime.getText().toString() == null
+				|| this.textTime.getText().toString().equals("")) {
+			this.displayAlertDialog("Error",
+					"Yout must set a time for the moment");
+			return false;
+		}
+
+		if (this.marker == null) {
+			this.displayAlertDialog("Error",
+					"Yout must set a location for the moment");
+			return false;
+		}
+		return true;
 	}
 
 	private void displayAlertDialog(String title, String message) {
@@ -280,33 +319,32 @@ public class AddNewActivity extends ActionBarActivity implements
 		// show it
 		alertDialog.show();
 	}
-	
+
 	public void displaySelectImageDialog(View view) {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
 		// set title
-		alertDialogBuilder.setTitle("Select image source")
-		
-		.setPositiveButton("Take photo",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-					    if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-					        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-					    }
-					}
-				})
-		
-		.setNegativeButton("Select from Media",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						Intent i = new Intent(
-								Intent.ACTION_PICK,
-								android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+		alertDialogBuilder
+				.setTitle("Select image source")
 
-						startActivityForResult(i, RESULT_LOAD_IMAGE);
-					}
-				});
+				.setPositiveButton("Take photo",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								Log.v("rene", "displaySelectImageDialog: ACTION_TAKE_PHOTO_B");
+								dispatchTakePictureIntent(ACTION_TAKE_PHOTO_B);
+							}
+						})
+
+				.setNegativeButton("Select from Media",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								Intent i = new Intent(
+										Intent.ACTION_PICK,
+										android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+								startActivityForResult(i, ACTION_LOAD_IMAGE);
+							}
+						});
 		// create alert dialog
 		AlertDialog alertDialog = alertDialogBuilder.create();
 
@@ -317,19 +355,6 @@ public class AddNewActivity extends ActionBarActivity implements
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
-	// public static class PlaceholderFragment extends Fragment {
-	//
-	// public PlaceholderFragment() {
-	// }
-	//
-	// @Override
-	// public View onCreateView(LayoutInflater inflater, ViewGroup container,
-	// Bundle savedInstanceState) {
-	// View rootView = inflater.inflate(R.layout.fragment_add_new,
-	// container, false);
-	// return rootView;
-	// }
-	// }
 
 	public void showDatePickerDialog(View v) {
 		DialogFragment newFragment = new DatePickerFragment();
@@ -346,7 +371,10 @@ public class AddNewActivity extends ActionBarActivity implements
 			int dayOfMonth) {
 		Log.v("DTE", "Date selected: " + year + "/" + monthOfYear + "/"
 				+ dayOfMonth);
+		this.setDateText(year, monthOfYear, dayOfMonth);
+	}
 
+	private void setDateText(int year, int monthOfYear, int dayOfMonth) {
 		String outputYear = String.valueOf(year);
 		String outputMonth = String.valueOf(monthOfYear);
 		String outputDay = String.valueOf(dayOfMonth);
@@ -359,13 +387,15 @@ public class AddNewActivity extends ActionBarActivity implements
 			outputDay = "0" + outputDay;
 
 		textDate.setText(outputDay + "/" + outputMonth + "/" + outputYear);
-
 	}
 
 	@Override
 	public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 		Log.v("DTE", "Time selected: " + hourOfDay + "/" + minute);
-
+		this.setTimeText(hourOfDay, minute);
+	}
+	
+	private void setTimeText(int hourOfDay, int minute){
 		String outputHour = String.valueOf(hourOfDay);
 		String outputMinute = String.valueOf(minute);
 
@@ -379,46 +409,78 @@ public class AddNewActivity extends ActionBarActivity implements
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
+		switch (requestCode) {
+		case ACTION_TAKE_PHOTO_B: {
+			if (resultCode == RESULT_OK) {
+				Log.v("rene", "onActivityResult: ACTION_TAKE_PHOTO_B");
+				handleBigCameraPhoto();
+			}
+			break;
+		} // ACTION_TAKE_PHOTO_B
 
-		if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-	        Bundle extras = data.getExtras();
-	        Bitmap imageBitmap = (Bitmap) extras.get("data");
-	        imageView.setImageBitmap(imageBitmap);
-	    }
-		
-		if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK
-				&& null != data) {
-			Uri selectedImage = data.getData();
-			String[] filePathColumn = { MediaStore.Images.Media.DATA };
+//		case ACTION_TAKE_PHOTO_S: {
+//			if (resultCode == RESULT_OK) {
+//				handleSmallCameraPhoto(data);
+//			}
+//			break;
+//		} // ACTION_TAKE_PHOTO_S
 
-			Cursor cursor = getContentResolver().query(selectedImage,
-					filePathColumn, null, null, null);
-			cursor.moveToFirst();
-
-			int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-			picturePath = cursor.getString(columnIndex);
-			cursor.close();
-
-			imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-
-		}
-
+//		case ACTION_TAKE_VIDEO: {
+//			if (resultCode == RESULT_OK) {
+//				handleCameraVideo(data);
+//			}
+//			break;
+//		} // ACTION_TAKE_VIDEO
+		} // switch
 	}
 
 	@Override
-	public void onSaveInstanceState(Bundle b) {
-		b.putString("image", picturePath);
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+
+		super.onRestoreInstanceState(savedInstanceState);
+		mImageBitmap = savedInstanceState.getParcelable(BITMAP_STORAGE_KEY);
+		mVideoUri = savedInstanceState.getParcelable(VIDEO_STORAGE_KEY);
+		imageView.setImageBitmap(mImageBitmap);
+		imageView.setVisibility(
+				savedInstanceState.getBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY) ? 
+						ImageView.VISIBLE : ImageView.INVISIBLE
+		);
+		mVideoView.setVideoURI(mVideoUri);
+		mVideoView.setVisibility(
+				savedInstanceState.getBoolean(VIDEOVIEW_VISIBILITY_STORAGE_KEY) ? 
+						ImageView.VISIBLE : ImageView.INVISIBLE
+		);
+
+		savedInstanceState.putString("title", this.textTitle.getText().toString());
+		savedInstanceState.putString("date", this.textDate.getText().toString());
+		savedInstanceState.putString("time", this.textTime.getText().toString());
+		savedInstanceState.putDouble("latitude", this.marker.getPosition().latitude);
+		savedInstanceState.putDouble("longitude", this.marker.getPosition().longitude);
 	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle b) {
-		// you need to handle NullPionterException here.
-		// Log.v("RESTORE", "PicturePath: " + picturePath);
-		if (b.getString("image") != null)
-			imageView.setImageBitmap(BitmapFactory.decodeFile(b
-					.getString("image")));
-		picturePath = b.getString("image");
+
+
+		if (b.getString("title") != null)
+			this.textTitle.setText(b.getString("title"));
+
+		if (b.getString("date") != null)
+			this.textDate.setText(b.getString("date"));
+
+		if (b.getString("time") != null)
+			this.textTime.setText(b.getString("time"));
+
+		setMarkerInPosition(
+				new LatLng(b.getDouble("latitude"), b.getDouble("longitude")),
+				true);
+		
+		b.putParcelable(BITMAP_STORAGE_KEY, mImageBitmap);
+		b.putParcelable(VIDEO_STORAGE_KEY, mVideoUri);
+		b.putBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY, (mImageBitmap != null) );
+		b.putBoolean(VIDEOVIEW_VISIBILITY_STORAGE_KEY, (mVideoUri != null) );
+		super.onSaveInstanceState(b);
+
 	}
 
 	public void showSettingsAlert() {
@@ -478,6 +540,149 @@ public class AddNewActivity extends ActionBarActivity implements
 
 		}
 
+	}
+	
+	
+	/* Photo album for this application */
+	private String getAlbumName() {
+		return getString(R.string.album_name);
+	}
+
+	
+	private File getAlbumDir() {
+		File storageDir = null;
+
+		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+			
+			storageDir = mAlbumStorageDirFactory.getAlbumStorageDir(getAlbumName());
+
+			if (storageDir != null) {
+				if (! storageDir.mkdirs()) {
+					if (! storageDir.exists()){
+						Log.d("CameraSample", "failed to create directory");
+						return null;
+					}
+				}
+			}
+			
+		} else {
+			Log.v(getString(R.string.app_name), "External storage is not mounted READ/WRITE.");
+		}
+		
+		return storageDir;
+	}
+	
+	private File createImageFile() throws IOException {
+		// Create an image file name
+		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",Locale.US).format(new Date());
+		String imageFileName = JPEG_FILE_PREFIX + timeStamp + "_";
+		File albumF = getAlbumDir();
+		File imageF = File.createTempFile(imageFileName, JPEG_FILE_SUFFIX, albumF);
+		return imageF;
+	}
+
+	private File setUpPhotoFile() throws IOException {
+		
+		File f = createImageFile();
+		mCurrentPhotoPath = f.getAbsolutePath();
+		
+		return f;
+	}
+
+	private void setPic() {
+
+		Log.v("rene", "setPic");
+		
+		/* There isn't enough memory to open up more than a couple camera photos */
+		/* So pre-scale the target bitmap into which the file is decoded */
+
+		/* Get the size of the ImageView */
+		int targetW = imageView.getWidth();
+		int targetH = imageView.getHeight();
+
+		/* Get the size of the image */
+		BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+		bmOptions.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+		int photoW = bmOptions.outWidth;
+		int photoH = bmOptions.outHeight;
+		
+		/* Figure out which way needs to be reduced less */
+		int scaleFactor = 1;
+		if ((targetW > 0) || (targetH > 0)) {
+			scaleFactor = Math.min(photoW/targetW, photoH/targetH);	
+		}
+
+		/* Set bitmap options to scale the image decode target */
+		bmOptions.inJustDecodeBounds = false;
+		bmOptions.inSampleSize = scaleFactor;
+		bmOptions.inPurgeable = true;
+
+		/* Decode the JPEG file into a Bitmap */
+		Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+		
+		/* Associate the Bitmap to the ImageView */
+		imageView.setImageBitmap(bitmap);
+		mVideoUri = null;
+		imageView.setVisibility(View.VISIBLE);
+		mVideoView.setVisibility(View.INVISIBLE);
+	}
+
+	private void galleryAddPic() {
+		    Intent mediaScanIntent = new Intent("android.intent.action.MEDIA_SCANNER_SCAN_FILE");
+			File f = new File(mCurrentPhotoPath);
+		    Uri contentUri = Uri.fromFile(f);
+		    mediaScanIntent.setData(contentUri);
+		    this.sendBroadcast(mediaScanIntent);
+	}
+
+	private void dispatchTakePictureIntent(int actionCode) {
+
+		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		Log.v("rene", "dispatchTakePictureIntent: ACTION_IMAGE_CAPTURE");
+		switch(actionCode) {
+		case ACTION_TAKE_PHOTO_B:
+			File f = null;
+			
+			try {
+				f = setUpPhotoFile();
+				mCurrentPhotoPath = f.getAbsolutePath();
+				takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+			} catch (IOException e) {
+				e.printStackTrace();
+				f = null;
+				mCurrentPhotoPath = null;
+			}
+			break;
+
+		default:
+			break;			
+		} // switch
+
+		startActivityForResult(takePictureIntent, actionCode);
+	}
+
+	private void dispatchTakeVideoIntent() {
+		Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+		startActivityForResult(takeVideoIntent, ACTION_TAKE_VIDEO);
+	}
+
+	private void handleBigCameraPhoto() {
+		Log.v("rene", "handleBigCameraPhoto:"+ mCurrentPhotoPath);
+		if (mCurrentPhotoPath != null) {
+			setPic();
+			galleryAddPic();
+			//mCurrentPhotoPath = null;
+		}
+
+	}
+
+	private void handleCameraVideo(Intent intent) {
+		mVideoUri = intent.getData();
+		mVideoView.setVideoURI(mVideoUri);
+		mImageBitmap = null;
+		mVideoView.setVisibility(View.VISIBLE);
+		imageView.setVisibility(View.INVISIBLE);
 	}
 
 }

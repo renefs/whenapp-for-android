@@ -11,6 +11,7 @@ import com.renefernandez.whenapp.model.Moment;
 import com.turbomanage.storm.SQLiteDao;
 import com.turbomanage.storm.types.DateConverter;
 import com.turbomanage.storm.types.LongConverter;
+import com.turbomanage.storm.types.BlobConverter;
 import com.turbomanage.storm.types.DoubleConverter;
 import com.turbomanage.storm.types.StringConverter;
 
@@ -30,8 +31,10 @@ public class MomentTable extends TableHelper<Moment> {
 	public enum Columns implements TableHelper.Column {
 		DATE,
 		_id,
+		IMAGE,
 		LATITUDE,
 		LONGITUDE,
+		THUMBNAIL,
 		TITLE
 	}
 
@@ -66,8 +69,10 @@ public class MomentTable extends TableHelper<Moment> {
 			"CREATE TABLE IF NOT EXISTS Moment(" +
 				"DATE INTEGER," +
 				"_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+				"IMAGE BLOB," +
 				"LATITUDE REAL," +
 				"LONGITUDE REAL," +
+				"THUMBNAIL BLOB," +
 				"TITLE TEXT" +
 			")";
 	}
@@ -89,9 +94,11 @@ public class MomentTable extends TableHelper<Moment> {
 		int colIdx; // entity field's position in the cursor
 		colIdx = c.getColumnIndex("DATE"); values[0] = (colIdx < 0) ? defaultValues[0] : DateConverter.GET.toString(getLongOrNull(c, colIdx));
 		colIdx = c.getColumnIndex("_id"); values[1] = (colIdx < 0) ? defaultValues[1] : LongConverter.GET.toString(getLongOrNull(c, colIdx));
-		colIdx = c.getColumnIndex("LATITUDE"); values[2] = (colIdx < 0) ? defaultValues[2] : DoubleConverter.GET.toString(getDoubleOrNull(c, colIdx));
-		colIdx = c.getColumnIndex("LONGITUDE"); values[3] = (colIdx < 0) ? defaultValues[3] : DoubleConverter.GET.toString(getDoubleOrNull(c, colIdx));
-		colIdx = c.getColumnIndex("TITLE"); values[4] = (colIdx < 0) ? defaultValues[4] : StringConverter.GET.toString(getStringOrNull(c, colIdx));
+		colIdx = c.getColumnIndex("IMAGE"); values[2] = (colIdx < 0) ? defaultValues[2] : BlobConverter.GET.toString(getBlobOrNull(c, colIdx));
+		colIdx = c.getColumnIndex("LATITUDE"); values[3] = (colIdx < 0) ? defaultValues[3] : DoubleConverter.GET.toString(getDoubleOrNull(c, colIdx));
+		colIdx = c.getColumnIndex("LONGITUDE"); values[4] = (colIdx < 0) ? defaultValues[4] : DoubleConverter.GET.toString(getDoubleOrNull(c, colIdx));
+		colIdx = c.getColumnIndex("THUMBNAIL"); values[5] = (colIdx < 0) ? defaultValues[5] : BlobConverter.GET.toString(getBlobOrNull(c, colIdx));
+		colIdx = c.getColumnIndex("TITLE"); values[6] = (colIdx < 0) ? defaultValues[6] : StringConverter.GET.toString(getStringOrNull(c, colIdx));
 		return values;
 	}
 
@@ -99,9 +106,11 @@ public class MomentTable extends TableHelper<Moment> {
 	public void bindRowValues(InsertHelper insHelper, String[] rowValues) {
 		if (rowValues[0] == null) insHelper.bindNull(1); else insHelper.bind(1, DateConverter.GET.fromString(rowValues[0]));
 		if (rowValues[1] == null) insHelper.bindNull(2); else insHelper.bind(2, LongConverter.GET.fromString(rowValues[1]));
-		if (rowValues[2] == null) insHelper.bindNull(3); else insHelper.bind(3, DoubleConverter.GET.fromString(rowValues[2]));
+		if (rowValues[2] == null) insHelper.bindNull(3); else insHelper.bind(3, BlobConverter.GET.fromString(rowValues[2]));
 		if (rowValues[3] == null) insHelper.bindNull(4); else insHelper.bind(4, DoubleConverter.GET.fromString(rowValues[3]));
-		if (rowValues[4] == null) insHelper.bindNull(5); else insHelper.bind(5, StringConverter.GET.fromString(rowValues[4]));
+		if (rowValues[4] == null) insHelper.bindNull(5); else insHelper.bind(5, DoubleConverter.GET.fromString(rowValues[4]));
+		if (rowValues[5] == null) insHelper.bindNull(6); else insHelper.bind(6, BlobConverter.GET.fromString(rowValues[5]));
+		if (rowValues[6] == null) insHelper.bindNull(7); else insHelper.bind(7, StringConverter.GET.fromString(rowValues[6]));
 	}
 
 	@Override
@@ -110,9 +119,11 @@ public class MomentTable extends TableHelper<Moment> {
 		Moment defaultObj = new Moment();
 		values[0] = DateConverter.GET.toString(DateConverter.GET.toSql(defaultObj.getDate()));
 		values[1] = LongConverter.GET.toString(LongConverter.GET.toSql(defaultObj.getId()));
-		values[2] = DoubleConverter.GET.toString(DoubleConverter.GET.toSql(defaultObj.getLatitude()));
-		values[3] = DoubleConverter.GET.toString(DoubleConverter.GET.toSql(defaultObj.getLongitude()));
-		values[4] = StringConverter.GET.toString(StringConverter.GET.toSql(defaultObj.getTitle()));
+		values[2] = BlobConverter.GET.toString(BlobConverter.GET.toSql(defaultObj.getImage()));
+		values[3] = DoubleConverter.GET.toString(DoubleConverter.GET.toSql(defaultObj.getLatitude()));
+		values[4] = DoubleConverter.GET.toString(DoubleConverter.GET.toSql(defaultObj.getLongitude()));
+		values[5] = BlobConverter.GET.toString(BlobConverter.GET.toSql(defaultObj.getThumbnail()));
+		values[6] = StringConverter.GET.toString(StringConverter.GET.toSql(defaultObj.getTitle()));
 		return values;
 	}
 
@@ -121,9 +132,11 @@ public class MomentTable extends TableHelper<Moment> {
 		Moment obj = new Moment();
 		obj.setDate(DateConverter.GET.fromSql(getLongOrNull(c, 0)));
 		obj.setId(c.getLong(1));
-		obj.setLatitude(DoubleConverter.GET.fromSql(getDoubleOrNull(c, 2)));
-		obj.setLongitude(DoubleConverter.GET.fromSql(getDoubleOrNull(c, 3)));
-		obj.setTitle(c.getString(4));
+		obj.setImage(c.getBlob(2));
+		obj.setLatitude(DoubleConverter.GET.fromSql(getDoubleOrNull(c, 3)));
+		obj.setLongitude(DoubleConverter.GET.fromSql(getDoubleOrNull(c, 4)));
+		obj.setThumbnail(c.getBlob(5));
+		obj.setTitle(c.getString(6));
 		return obj;
 	}
 
@@ -132,8 +145,10 @@ public class MomentTable extends TableHelper<Moment> {
 		ContentValues cv = new ContentValues();
 		cv.put("DATE", DateConverter.GET.toSql(obj.getDate()));
 		cv.put("_id", obj.getId());
+		cv.put("IMAGE", obj.getImage());
 		cv.put("LATITUDE", DoubleConverter.GET.toSql(obj.getLatitude()));
 		cv.put("LONGITUDE", DoubleConverter.GET.toSql(obj.getLongitude()));
+		cv.put("THUMBNAIL", obj.getThumbnail());
 		cv.put("TITLE", obj.getTitle());
 		return cv;
 	}
@@ -146,10 +161,14 @@ public class MomentTable extends TableHelper<Moment> {
 			filter = filter.eq(Columns.DATE, DateConverter.GET.toSql(obj.getDate()));
 		if (obj.getId() != defaultObj.getId())
 			filter = filter.eq(Columns._id, LongConverter.GET.toSql(obj.getId()));
+		if (obj.getImage() != defaultObj.getImage())
+			filter = filter.eq(Columns.IMAGE, BlobConverter.GET.toSql(obj.getImage()));
 		if (obj.getLatitude() != defaultObj.getLatitude())
 			filter = filter.eq(Columns.LATITUDE, DoubleConverter.GET.toSql(obj.getLatitude()));
 		if (obj.getLongitude() != defaultObj.getLongitude())
 			filter = filter.eq(Columns.LONGITUDE, DoubleConverter.GET.toSql(obj.getLongitude()));
+		if (obj.getThumbnail() != defaultObj.getThumbnail())
+			filter = filter.eq(Columns.THUMBNAIL, BlobConverter.GET.toSql(obj.getThumbnail()));
 		if (obj.getTitle() != defaultObj.getTitle())
 			filter = filter.eq(Columns.TITLE, StringConverter.GET.toSql(obj.getTitle()));
 		return filter;
