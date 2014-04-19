@@ -8,6 +8,11 @@ import com.turbomanage.storm.api.Entity;
 @Entity
 public class Moment implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4965065697188384250L;
+
 	private long id;
 
 	private String title;

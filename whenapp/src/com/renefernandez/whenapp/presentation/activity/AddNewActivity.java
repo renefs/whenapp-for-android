@@ -19,9 +19,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.renefernandez.whenapp.R;
-import com.renefernandez.whenapp.R.id;
-import com.renefernandez.whenapp.R.layout;
-import com.renefernandez.whenapp.R.menu;
 import com.renefernandez.whenapp.business.location.GPSTracker;
 import com.renefernandez.whenapp.model.Moment;
 import com.renefernandez.whenapp.model.dao.MomentDao;
@@ -34,15 +31,12 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -51,7 +45,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -64,21 +58,21 @@ import android.provider.Settings;
 public class AddNewActivity extends ActionBarActivity implements
 		OnDateSetListener, OnTimeSetListener {
 
-	//MAP
+	// MAP
 	// http://www.vogella.com/tutorials/AndroidGoogleMaps/article.html#maps_markers
-	static final LatLng EUITIO = new LatLng(43.35560534, -5.850938559);	
+	static final LatLng EUITIO = new LatLng(43.35560534, -5.850938559);
 	private GoogleMap googleMap;
 	private Marker marker;
 	private GPSTracker gps;
-	
-	//MEDIA
+
+	// MEDIA
 	private static final int ACTION_TAKE_PHOTO_B = 1;
-	private static int ACTION_LOAD_IMAGE = 2;
+	private static final int ACTION_LOAD_IMAGE = 2;
 	private static final int ACTION_TAKE_VIDEO = 3;
 
 	private static final String BITMAP_STORAGE_KEY = "viewbitmap";
 	private static final String IMAGEVIEW_VISIBILITY_STORAGE_KEY = "imageviewvisibility";
-	
+
 	private Bitmap mImageBitmap;
 
 	private static final String VIDEO_STORAGE_KEY = "viewvideo";
@@ -93,17 +87,17 @@ public class AddNewActivity extends ActionBarActivity implements
 
 	private AlbumStorageDirFactory mAlbumStorageDirFactory = null;
 
-	//Fields
+	// Fields
 	private EditText textTitle;
 
 	private EditText textDate;
 	private EditText textTime;
 	private ImageView imageView;
 
-	///////////////////////////////////
-	///// Methods
-	//////////////////////////////////
-	
+	// /////////////////////////////////
+	// /// Methods
+	// ////////////////////////////////
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -119,7 +113,14 @@ public class AddNewActivity extends ActionBarActivity implements
 		imageView = (ImageView) findViewById(R.id.imgView);
 		mVideoView = (VideoView) findViewById(R.id.videoView1);
 
+		loadInitialLocationOnMap(mapFragment);
 
+		loadCalendarCurrentDate();
+		
+		mVideoView.setVisibility(View.VISIBLE);
+	}
+
+	private void loadInitialLocationOnMap(MapFragment mapFragment) {
 		if (mapFragment == null)
 			Log.e("AddNewActivity", "MAPFRAGMENT ES NULL");
 
@@ -138,12 +139,16 @@ public class AddNewActivity extends ActionBarActivity implements
 			}
 
 		}
-		
-		Calendar calendar = Calendar.getInstance(); 
-		this.setDateText(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-		this.setTimeText(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+	}
 
-		
+	private void loadCalendarCurrentDate() {
+		Calendar calendar = Calendar.getInstance();
+		this.setDateText(calendar.get(Calendar.YEAR),
+				calendar.get(Calendar.MONTH),
+				calendar.get(Calendar.DAY_OF_MONTH));
+		this.setTimeText(calendar.get(Calendar.HOUR_OF_DAY),
+				calendar.get(Calendar.MINUTE));
+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
 			mAlbumStorageDirFactory = new FroyoAlbumDirFactory();
 		} else {
@@ -203,7 +208,7 @@ public class AddNewActivity extends ActionBarActivity implements
 
 	private void addNewMoment() {
 
-		if(!momentIsValid()){
+		if (!momentIsValid()) {
 			return;
 		}
 
@@ -211,7 +216,8 @@ public class AddNewActivity extends ActionBarActivity implements
 		Double latitude = this.marker.getPosition().latitude;
 		Double longitude = this.marker.getPosition().longitude;
 
-		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy-hh:mm", Locale.US);
+		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy-hh:mm",
+				Locale.US);
 		String dateInString = this.textDate.getText().toString() + "-"
 				+ this.textTime.getText().toString();
 
@@ -230,24 +236,24 @@ public class AddNewActivity extends ActionBarActivity implements
 			this.displayAlertDialog("Error", "The date format was incorrect.");
 			return;
 		}
-		
-		ByteArrayOutputStream bos=new ByteArrayOutputStream();
-		
-		byte[]  img=null;
+
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+		byte[] img = null;
 		Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath);
-		
-		if(bitmap!=null){
+
+		if (bitmap != null) {
 			Log.v("rene", "Salvando imagen del moment");
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-			img=bos.toByteArray();
-		}else{
+			img = bos.toByteArray();
+		} else {
 			Log.e("rene", "La imagen es null");
 		}
-		
-		//Insertando
+
+		// Insertando
 
 		Moment newMoment = new Moment(title, date, latitude, longitude);
-		if(img!=null){
+		if (img != null) {
 			newMoment.setImage(img);
 			Log.v("rene", "Imagen salvada");
 		}
@@ -272,7 +278,7 @@ public class AddNewActivity extends ActionBarActivity implements
 	}
 
 	private boolean momentIsValid() {
-		//Precondiciones
+		// Precondiciones
 		if (this.textTitle.getText().toString() == null
 				|| this.textTitle.getText().toString().equals("")) {
 			this.displayAlertDialog("Error", "Moment title cannot be empty");
@@ -330,7 +336,8 @@ public class AddNewActivity extends ActionBarActivity implements
 				.setPositiveButton("Take photo",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								Log.v("rene", "displaySelectImageDialog: ACTION_TAKE_PHOTO_B");
+								Log.v("rene",
+										"displaySelectImageDialog: ACTION_TAKE_PHOTO_B");
 								dispatchTakePictureIntent(ACTION_TAKE_PHOTO_B);
 							}
 						})
@@ -338,11 +345,17 @@ public class AddNewActivity extends ActionBarActivity implements
 				.setNegativeButton("Select from Media",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								Intent i = new Intent(
-										Intent.ACTION_PICK,
-										android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
-								startActivityForResult(i, ACTION_LOAD_IMAGE);
+								dispatchLoadPictureIntent(ACTION_LOAD_IMAGE);
+							}
+
+						})
+				.setNeutralButton("Record video",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								Log.v("rene",
+										"displaySelectImageDialog: ACTION_TAKE_VIDEO");
+								dispatchTakeVideoIntent();
 							}
 						});
 		// create alert dialog
@@ -350,6 +363,14 @@ public class AddNewActivity extends ActionBarActivity implements
 
 		// show it
 		alertDialog.show();
+	}
+
+	private void dispatchLoadPictureIntent(int aCTION_LOAD_IMAGE) {
+		Intent i = new Intent(Intent.ACTION_PICK,
+				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+		startActivityForResult(i, ACTION_LOAD_IMAGE);
+
 	}
 
 	/**
@@ -394,8 +415,8 @@ public class AddNewActivity extends ActionBarActivity implements
 		Log.v("DTE", "Time selected: " + hourOfDay + "/" + minute);
 		this.setTimeText(hourOfDay, minute);
 	}
-	
-	private void setTimeText(int hourOfDay, int minute){
+
+	private void setTimeText(int hourOfDay, int minute) {
 		String outputHour = String.valueOf(hourOfDay);
 		String outputMinute = String.valueOf(minute);
 
@@ -418,20 +439,35 @@ public class AddNewActivity extends ActionBarActivity implements
 			break;
 		} // ACTION_TAKE_PHOTO_B
 
-//		case ACTION_TAKE_PHOTO_S: {
-//			if (resultCode == RESULT_OK) {
-//				handleSmallCameraPhoto(data);
-//			}
-//			break;
-//		} // ACTION_TAKE_PHOTO_S
+		case ACTION_LOAD_IMAGE: {
+			if (resultCode == RESULT_OK) {
+				handleLoadPicture(data);
+			}
+			break;
+		} // ACTION_TAKE_PHOTO_S
 
-//		case ACTION_TAKE_VIDEO: {
-//			if (resultCode == RESULT_OK) {
-//				handleCameraVideo(data);
-//			}
-//			break;
-//		} // ACTION_TAKE_VIDEO
+		case ACTION_TAKE_VIDEO: {
+			if (resultCode == RESULT_OK) {
+				handleCameraVideo(data);
+			}
+			break;
+		} // ACTION_TAKE_VIDEO
 		} // switch
+	}
+
+	private void handleLoadPicture(Intent data) {
+		Uri selectedImage = data.getData();
+		String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+		Cursor cursor = getContentResolver().query(selectedImage,
+				filePathColumn, null, null, null);
+		cursor.moveToFirst();
+
+		int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+		this.mCurrentPhotoPath = cursor.getString(columnIndex);
+		cursor.close();
+
+		this.setPic();
 	}
 
 	@Override
@@ -441,26 +477,30 @@ public class AddNewActivity extends ActionBarActivity implements
 		mImageBitmap = savedInstanceState.getParcelable(BITMAP_STORAGE_KEY);
 		mVideoUri = savedInstanceState.getParcelable(VIDEO_STORAGE_KEY);
 		imageView.setImageBitmap(mImageBitmap);
-		imageView.setVisibility(
-				savedInstanceState.getBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY) ? 
-						ImageView.VISIBLE : ImageView.INVISIBLE
-		);
+		imageView
+				.setVisibility(savedInstanceState
+						.getBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY) ? ImageView.VISIBLE
+						: ImageView.INVISIBLE);
 		mVideoView.setVideoURI(mVideoUri);
-		mVideoView.setVisibility(
-				savedInstanceState.getBoolean(VIDEOVIEW_VISIBILITY_STORAGE_KEY) ? 
-						ImageView.VISIBLE : ImageView.INVISIBLE
-		);
+		mVideoView
+				.setVisibility(savedInstanceState
+						.getBoolean(VIDEOVIEW_VISIBILITY_STORAGE_KEY) ? ImageView.VISIBLE
+						: ImageView.INVISIBLE);
 
-		savedInstanceState.putString("title", this.textTitle.getText().toString());
-		savedInstanceState.putString("date", this.textDate.getText().toString());
-		savedInstanceState.putString("time", this.textTime.getText().toString());
-		savedInstanceState.putDouble("latitude", this.marker.getPosition().latitude);
-		savedInstanceState.putDouble("longitude", this.marker.getPosition().longitude);
+		savedInstanceState.putString("title", this.textTitle.getText()
+				.toString());
+		savedInstanceState
+				.putString("date", this.textDate.getText().toString());
+		savedInstanceState
+				.putString("time", this.textTime.getText().toString());
+		savedInstanceState.putDouble("latitude",
+				this.marker.getPosition().latitude);
+		savedInstanceState.putDouble("longitude",
+				this.marker.getPosition().longitude);
 	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle b) {
-
 
 		if (b.getString("title") != null)
 			this.textTitle.setText(b.getString("title"));
@@ -474,11 +514,11 @@ public class AddNewActivity extends ActionBarActivity implements
 		setMarkerInPosition(
 				new LatLng(b.getDouble("latitude"), b.getDouble("longitude")),
 				true);
-		
+
 		b.putParcelable(BITMAP_STORAGE_KEY, mImageBitmap);
 		b.putParcelable(VIDEO_STORAGE_KEY, mVideoUri);
-		b.putBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY, (mImageBitmap != null) );
-		b.putBoolean(VIDEOVIEW_VISIBILITY_STORAGE_KEY, (mVideoUri != null) );
+		b.putBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY, (mImageBitmap != null));
+		b.putBoolean(VIDEOVIEW_VISIBILITY_STORAGE_KEY, (mVideoUri != null));
 		super.onSaveInstanceState(b);
 
 	}
@@ -541,58 +581,61 @@ public class AddNewActivity extends ActionBarActivity implements
 		}
 
 	}
-	
-	
+
 	/* Photo album for this application */
 	private String getAlbumName() {
 		return getString(R.string.album_name);
 	}
 
-	
 	private File getAlbumDir() {
 		File storageDir = null;
 
-		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-			
-			storageDir = mAlbumStorageDirFactory.getAlbumStorageDir(getAlbumName());
+		if (Environment.MEDIA_MOUNTED.equals(Environment
+				.getExternalStorageState())) {
+
+			storageDir = mAlbumStorageDirFactory
+					.getAlbumStorageDir(getAlbumName());
 
 			if (storageDir != null) {
-				if (! storageDir.mkdirs()) {
-					if (! storageDir.exists()){
+				if (!storageDir.mkdirs()) {
+					if (!storageDir.exists()) {
 						Log.d("CameraSample", "failed to create directory");
 						return null;
 					}
 				}
 			}
-			
+
 		} else {
-			Log.v(getString(R.string.app_name), "External storage is not mounted READ/WRITE.");
+			Log.v(getString(R.string.app_name),
+					"External storage is not mounted READ/WRITE.");
 		}
-		
+
 		return storageDir;
 	}
-	
+
 	private File createImageFile() throws IOException {
 		// Create an image file name
-		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",Locale.US).format(new Date());
+		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
+				.format(new Date());
 		String imageFileName = JPEG_FILE_PREFIX + timeStamp + "_";
 		File albumF = getAlbumDir();
-		File imageF = File.createTempFile(imageFileName, JPEG_FILE_SUFFIX, albumF);
+		File imageF = File.createTempFile(imageFileName, JPEG_FILE_SUFFIX,
+				albumF);
 		return imageF;
 	}
 
 	private File setUpPhotoFile() throws IOException {
-		
+
 		File f = createImageFile();
 		mCurrentPhotoPath = f.getAbsolutePath();
-		
+
 		return f;
 	}
 
 	private void setPic() {
 
 		Log.v("rene", "setPic");
-		
+
 		/* There isn't enough memory to open up more than a couple camera photos */
 		/* So pre-scale the target bitmap into which the file is decoded */
 
@@ -606,11 +649,11 @@ public class AddNewActivity extends ActionBarActivity implements
 		BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
 		int photoW = bmOptions.outWidth;
 		int photoH = bmOptions.outHeight;
-		
+
 		/* Figure out which way needs to be reduced less */
 		int scaleFactor = 1;
 		if ((targetW > 0) || (targetH > 0)) {
-			scaleFactor = Math.min(photoW/targetW, photoH/targetH);	
+			scaleFactor = Math.min(photoW / targetW, photoH / targetH);
 		}
 
 		/* Set bitmap options to scale the image decode target */
@@ -620,7 +663,7 @@ public class AddNewActivity extends ActionBarActivity implements
 
 		/* Decode the JPEG file into a Bitmap */
 		Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-		
+
 		/* Associate the Bitmap to the ImageView */
 		imageView.setImageBitmap(bitmap);
 		mVideoUri = null;
@@ -629,25 +672,27 @@ public class AddNewActivity extends ActionBarActivity implements
 	}
 
 	private void galleryAddPic() {
-		    Intent mediaScanIntent = new Intent("android.intent.action.MEDIA_SCANNER_SCAN_FILE");
-			File f = new File(mCurrentPhotoPath);
-		    Uri contentUri = Uri.fromFile(f);
-		    mediaScanIntent.setData(contentUri);
-		    this.sendBroadcast(mediaScanIntent);
+		Intent mediaScanIntent = new Intent(
+				"android.intent.action.MEDIA_SCANNER_SCAN_FILE");
+		File f = new File(mCurrentPhotoPath);
+		Uri contentUri = Uri.fromFile(f);
+		mediaScanIntent.setData(contentUri);
+		this.sendBroadcast(mediaScanIntent);
 	}
 
 	private void dispatchTakePictureIntent(int actionCode) {
 
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		Log.v("rene", "dispatchTakePictureIntent: ACTION_IMAGE_CAPTURE");
-		switch(actionCode) {
+		switch (actionCode) {
 		case ACTION_TAKE_PHOTO_B:
 			File f = null;
-			
+
 			try {
 				f = setUpPhotoFile();
 				mCurrentPhotoPath = f.getAbsolutePath();
-				takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+				takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+						Uri.fromFile(f));
 			} catch (IOException e) {
 				e.printStackTrace();
 				f = null;
@@ -656,7 +701,7 @@ public class AddNewActivity extends ActionBarActivity implements
 			break;
 
 		default:
-			break;			
+			break;
 		} // switch
 
 		startActivityForResult(takePictureIntent, actionCode);
@@ -668,11 +713,11 @@ public class AddNewActivity extends ActionBarActivity implements
 	}
 
 	private void handleBigCameraPhoto() {
-		Log.v("rene", "handleBigCameraPhoto:"+ mCurrentPhotoPath);
+		Log.v("rene", "handleBigCameraPhoto:" + mCurrentPhotoPath);
 		if (mCurrentPhotoPath != null) {
 			setPic();
 			galleryAddPic();
-			//mCurrentPhotoPath = null;
+			// mCurrentPhotoPath = null;
 		}
 
 	}
