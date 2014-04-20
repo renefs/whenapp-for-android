@@ -24,6 +24,8 @@ import com.renefernandez.whenapp.model.Moment;
 import com.renefernandez.whenapp.model.dao.MomentDao;
 import com.renefernandez.whenapp.presentation.dialog.DatePickerFragment;
 import com.renefernandez.whenapp.presentation.dialog.TimePickerFragment;
+import com.renefernandez.whenapp.presentation.util.DateFormater;
+import com.renefernandez.whenapp.presentation.util.DialogHelper;
 
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.DialogFragment;
@@ -31,12 +33,10 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.DialogInterface;
-
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -45,7 +45,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -116,7 +115,7 @@ public class AddNewActivity extends ActionBarActivity implements
 		loadInitialLocationOnMap(mapFragment);
 
 		loadCalendarCurrentDate();
-		
+
 		mVideoView.setVisibility(View.VISIBLE);
 	}
 
@@ -135,7 +134,7 @@ public class AddNewActivity extends ActionBarActivity implements
 						new LatLng(gps.getLatitude(), gps.getLongitude()), true);
 
 			} else {
-				showSettingsAlert();
+				showGPSSettingsAlert();
 			}
 
 		}
@@ -143,11 +142,14 @@ public class AddNewActivity extends ActionBarActivity implements
 
 	private void loadCalendarCurrentDate() {
 		Calendar calendar = Calendar.getInstance();
-		this.setDateText(calendar.get(Calendar.YEAR),
-				calendar.get(Calendar.MONTH),
-				calendar.get(Calendar.DAY_OF_MONTH));
-		this.setTimeText(calendar.get(Calendar.HOUR_OF_DAY),
-				calendar.get(Calendar.MINUTE));
+
+		textDate.setText(DateFormater.getDateFormated(
+				calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+				calendar.get(Calendar.DAY_OF_MONTH)));
+
+		textTime.setText(DateFormater.getTimeFormated(
+				calendar.get(Calendar.HOUR_OF_DAY),
+				calendar.get(Calendar.MINUTE)));
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
 			mAlbumStorageDirFactory = new FroyoAlbumDirFactory();
@@ -175,24 +177,17 @@ public class AddNewActivity extends ActionBarActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.add_new, menu);
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		// Take appropriate action for each action item click
-		switch (id) {
 
-		case R.id.action_settings:
-			Toast.makeText(this.getBaseContext(), "Settings",
-					Toast.LENGTH_SHORT).show();
-			return true;
+		int id = item.getItemId();
+
+		switch (id) {
+		
 		case R.id.action_save:
 
 			Toast.makeText(this.getBaseContext(), "Saving...",
@@ -216,6 +211,47 @@ public class AddNewActivity extends ActionBarActivity implements
 		Double latitude = this.marker.getPosition().latitude;
 		Double longitude = this.marker.getPosition().longitude;
 
+		Date date = getDateFromString();
+
+		if (date == null) {
+			DialogHelper.displayAlertDialog("Error",
+					"The date format was incorrect.", this);
+		}
+
+		byte[] binaryImage = getByteArrayFromImage();
+
+		Moment newMoment = new Moment(title).withDate(date).withLocation(
+				latitude, longitude);
+		if (binaryImage != null) {
+			newMoment.setImage(binaryImage);
+			Log.v("rene", "Imagen salvada");
+		}
+		saveMomentInDatabase(newMoment);
+
+	}
+
+	private void saveMomentInDatabase(Moment newMoment) {
+		MomentDao dao = new MomentDao(this);
+
+		long id = dao.insert(newMoment);
+
+		if (id < 0) {
+			DialogHelper.displayAlertDialog("Error",
+					"Moment could not be saved.", this);
+			Log.e("rene", "Error saving moment in DB: Returned id was " + id);
+			return;
+		}
+
+		Intent intent = new Intent(this, MainActivity.class);
+
+		/** Starting the activity by passing the implicit intent */
+		startActivity(intent);
+
+		Toast.makeText(this.getBaseContext(), "Moment was added successfully!",
+				Toast.LENGTH_SHORT).show();
+	}
+
+	private Date getDateFromString() {
 		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy-hh:mm",
 				Locale.US);
 		String dateInString = this.textDate.getText().toString() + "-"
@@ -232,11 +268,10 @@ public class AddNewActivity extends ActionBarActivity implements
 			e.printStackTrace();
 		}
 
-		if (date == null) {
-			this.displayAlertDialog("Error", "The date format was incorrect.");
-			return;
-		}
+		return date;
+	}
 
+	private byte[] getByteArrayFromImage() {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
 		byte[] img = null;
@@ -249,81 +284,37 @@ public class AddNewActivity extends ActionBarActivity implements
 		} else {
 			Log.e("rene", "La imagen es null");
 		}
-
-		// Insertando
-
-		Moment newMoment = new Moment(title, date, latitude, longitude);
-		if (img != null) {
-			newMoment.setImage(img);
-			Log.v("rene", "Imagen salvada");
-		}
-		MomentDao dao = new MomentDao(this);
-
-		long id = dao.insert(newMoment);
-
-		if (id < 0) {
-			this.displayAlertDialog("Error", "Moment could not be saved.");
-			Log.e("rene", "Error saving moment in DB: Returned id was " + id);
-			return;
-		}
-
-		Intent intent = new Intent(this, MainActivity.class);
-
-		/** Starting the activity by passing the implicit intent */
-		startActivity(intent);
-
-		Toast.makeText(this.getBaseContext(), "Moment was added successfully!",
-				Toast.LENGTH_SHORT).show();
-
+		return img;
 	}
 
 	private boolean momentIsValid() {
 		// Precondiciones
 		if (this.textTitle.getText().toString() == null
 				|| this.textTitle.getText().toString().equals("")) {
-			this.displayAlertDialog("Error", "Moment title cannot be empty");
+			DialogHelper.displayAlertDialog("Error",
+					"Moment title cannot be empty", this);
 			return false;
 		}
 		if (this.textDate.getText().toString() == null
 				|| this.textDate.getText().toString().equals("")) {
-			this.displayAlertDialog("Error",
-					"Yout must set a date for the moment");
+			DialogHelper.displayAlertDialog("Error",
+					"Yout must set a date for the moment", this);
 			return false;
 		}
 
 		if (this.textTime.getText().toString() == null
 				|| this.textTime.getText().toString().equals("")) {
-			this.displayAlertDialog("Error",
-					"Yout must set a time for the moment");
+			DialogHelper.displayAlertDialog("Error",
+					"Yout must set a time for the moment", this);
 			return false;
 		}
 
 		if (this.marker == null) {
-			this.displayAlertDialog("Error",
-					"Yout must set a location for the moment");
+			DialogHelper.displayAlertDialog("Error",
+					"Yout must set a location for the moment", this);
 			return false;
 		}
 		return true;
-	}
-
-	private void displayAlertDialog(String title, String message) {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-		// set title
-		alertDialogBuilder.setTitle(title);
-		alertDialogBuilder.setMessage(message).setNegativeButton("Ok",
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						// if this button is clicked, just close
-						// the dialog box and do nothing
-						dialog.cancel();
-					}
-				});
-		// create alert dialog
-		AlertDialog alertDialog = alertDialogBuilder.create();
-
-		// show it
-		alertDialog.show();
 	}
 
 	public void displaySelectImageDialog(View view) {
@@ -358,10 +349,9 @@ public class AddNewActivity extends ActionBarActivity implements
 								dispatchTakeVideoIntent();
 							}
 						});
-		// create alert dialog
+
 		AlertDialog alertDialog = alertDialogBuilder.create();
 
-		// show it
 		alertDialog.show();
 	}
 
@@ -372,10 +362,6 @@ public class AddNewActivity extends ActionBarActivity implements
 		startActivityForResult(i, ACTION_LOAD_IMAGE);
 
 	}
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
 
 	public void showDatePickerDialog(View v) {
 		DialogFragment newFragment = new DatePickerFragment();
@@ -392,40 +378,15 @@ public class AddNewActivity extends ActionBarActivity implements
 			int dayOfMonth) {
 		Log.v("DTE", "Date selected: " + year + "/" + monthOfYear + "/"
 				+ dayOfMonth);
-		this.setDateText(year, monthOfYear, dayOfMonth);
-	}
 
-	private void setDateText(int year, int monthOfYear, int dayOfMonth) {
-		String outputYear = String.valueOf(year);
-		String outputMonth = String.valueOf(monthOfYear);
-		String outputDay = String.valueOf(dayOfMonth);
-
-		if (year < 999)
-			outputYear = "0" + outputYear;
-		if (monthOfYear < 10)
-			outputMonth = "0" + outputMonth;
-		if (dayOfMonth < 10)
-			outputDay = "0" + outputDay;
-
-		textDate.setText(outputDay + "/" + outputMonth + "/" + outputYear);
+		textDate.setText(DateFormater.getDateFormated(year, monthOfYear,
+				dayOfMonth));
 	}
 
 	@Override
 	public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 		Log.v("DTE", "Time selected: " + hourOfDay + "/" + minute);
-		this.setTimeText(hourOfDay, minute);
-	}
-
-	private void setTimeText(int hourOfDay, int minute) {
-		String outputHour = String.valueOf(hourOfDay);
-		String outputMinute = String.valueOf(minute);
-
-		if (hourOfDay < 10)
-			outputHour = "0" + outputHour;
-		if (minute < 10)
-			outputMinute = "0" + outputMinute;
-
-		textTime.setText(outputHour + ":" + outputMinute);
+		textTime.setText(DateFormater.getTimeFormated(hourOfDay, minute));
 	}
 
 	@Override
@@ -467,7 +428,7 @@ public class AddNewActivity extends ActionBarActivity implements
 		this.mCurrentPhotoPath = cursor.getString(columnIndex);
 		cursor.close();
 
-		this.setPic();
+		this.setPictureOnImageView();
 	}
 
 	@Override
@@ -523,7 +484,7 @@ public class AddNewActivity extends ActionBarActivity implements
 
 	}
 
-	public void showSettingsAlert() {
+	public void showGPSSettingsAlert() {
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 
 		// Setting Dialog Title
@@ -532,9 +493,6 @@ public class AddNewActivity extends ActionBarActivity implements
 		// Setting Dialog Message
 		alertDialog
 				.setMessage("GPS is not enabled. Do you want to go to settings menu?");
-
-		// Setting Icon to Dialog
-		// alertDialog.setIcon(R.drawable.delete);
 
 		// On pressing Settings button
 		alertDialog.setPositiveButton("Settings",
@@ -570,12 +528,9 @@ public class AddNewActivity extends ActionBarActivity implements
 
 		if (withZoom == true) {
 
-			// Move the camera instantly to hamburg with a zoom of
-			// 15.
 			googleMap.moveCamera(CameraUpdateFactory
 					.newLatLngZoom(position, 17));
 
-			// Zoom in, animating the camera.
 			googleMap.animateCamera(CameraUpdateFactory.zoomTo(17), 2000, null);
 
 		}
@@ -632,7 +587,7 @@ public class AddNewActivity extends ActionBarActivity implements
 		return f;
 	}
 
-	private void setPic() {
+	private void setPictureOnImageView() {
 
 		Log.v("rene", "setPic");
 
@@ -671,7 +626,7 @@ public class AddNewActivity extends ActionBarActivity implements
 		mVideoView.setVisibility(View.INVISIBLE);
 	}
 
-	private void galleryAddPic() {
+	private void addPictureToGallery() {
 		Intent mediaScanIntent = new Intent(
 				"android.intent.action.MEDIA_SCANNER_SCAN_FILE");
 		File f = new File(mCurrentPhotoPath);
@@ -715,8 +670,8 @@ public class AddNewActivity extends ActionBarActivity implements
 	private void handleBigCameraPhoto() {
 		Log.v("rene", "handleBigCameraPhoto:" + mCurrentPhotoPath);
 		if (mCurrentPhotoPath != null) {
-			setPic();
-			galleryAddPic();
+			setPictureOnImageView();
+			addPictureToGallery();
 			// mCurrentPhotoPath = null;
 		}
 

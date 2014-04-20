@@ -8,15 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import com.renefernandez.whenapp.R;
-import com.renefernandez.whenapp.model.Moment;
-import com.renefernandez.whenapp.model.dao.MomentDao;
-import com.renefernandez.whenapp.presentation.fragment.MomentDetailFragment;
-
-import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -31,8 +24,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
+
+import com.renefernandez.whenapp.R;
+import com.renefernandez.whenapp.model.Moment;
+import com.renefernandez.whenapp.model.dao.MomentDao;
+import com.renefernandez.whenapp.presentation.fragment.MomentDetailFragment;
 
 public class MomentDetailActivity extends ActionBarActivity {
 
@@ -43,42 +40,20 @@ public class MomentDetailActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		/** Setting the layout for this activity */
 		setContentView(R.layout.moment_detail_activity);
-
-		/** Getting the fragment manager for fragment related operations */
 		FragmentManager fragmentManager = getFragmentManager();
-
-		/**
-		 * Getting the fragmenttransaction object, which can be used to add,
-		 * remove or replace a fragment
-		 */
 		FragmentTransaction fragmentTransacton = fragmentManager
 				.beginTransaction();
-
-		/** Instantiating the fragment CountryDetailsFragment */
 		detailsFragment = new MomentDetailFragment();
 
-		/**
-		 * Creating a bundle object to pass the data(the clicked item's
-		 * position) from the activity to the fragment
-		 */
 		Bundle b = new Bundle();
-
-		/** Setting the data to the bundle object from the Intent */
-		// b.putInt("position", getIntent().getIntExtra("position", 0));
-
 		this.momentId = getIntent().getLongExtra("moment_id", 1);
 
 		b.putLong("moment_id", momentId);
-
-		/** Setting the bundle object to the fragment */
 		detailsFragment.setArguments(b);
 
-		/** Adding the fragment to the fragment transaction */
 		fragmentTransacton.add(R.id.moment_detail_container, detailsFragment);
 
-		/** Making this transaction in effect */
 		fragmentTransacton.commit();
 
 	}
@@ -94,12 +69,7 @@ public class MomentDetailActivity extends ActionBarActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		// Take appropriate action for each action item click
-
 		switch (id) {
 
 		case R.id.action_settings:
@@ -160,8 +130,6 @@ public class MomentDetailActivity extends ActionBarActivity {
 			Uri u1 = Uri.fromFile(file);
 
 			Intent email = new Intent(Intent.ACTION_SEND);
-			// email.putExtra(Intent.EXTRA_EMAIL, new
-			// String[]{"youremail@yahoo.com"});
 			email.putExtra(Intent.EXTRA_SUBJECT, "Your moment");
 			email.putExtra(Intent.EXTRA_TEXT, "Yout moment backup");
 			email.putExtra(Intent.EXTRA_STREAM, u1);

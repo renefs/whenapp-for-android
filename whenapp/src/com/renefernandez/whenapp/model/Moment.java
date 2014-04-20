@@ -6,7 +6,7 @@ import java.util.Date;
 import com.turbomanage.storm.api.Entity;
 
 @Entity
-public class Moment implements Serializable{
+public class Moment implements Serializable {
 
 	/**
 	 * 
@@ -19,7 +19,7 @@ public class Moment implements Serializable{
 	private Date date;
 	private Double latitude;
 	private Double longitude;
-	
+
 	private byte[] image;
 	private byte[] thumbnail;
 
@@ -27,12 +27,20 @@ public class Moment implements Serializable{
 
 	}
 
-	public Moment(String title, Date date, Double latitude, Double longitude) {
+	public Moment(String title) {
 		super();
 		this.title = title;
+	}
+
+	public Moment withDate(Date date) {
 		this.date = date;
+		return this;
+	}
+
+	public Moment withLocation(Double latitude, Double longitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
+		return this;
 	}
 
 	public Double getLatitude() {

@@ -2,31 +2,27 @@ package com.renefernandez.whenapp.presentation.activity;
 
 import java.util.Locale;
 
-import com.google.android.gms.maps.SupportMapFragment;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.Toast;
+
 import com.renefernandez.whenapp.R;
 import com.renefernandez.whenapp.presentation.fragment.MomentListFragment;
 import com.renefernandez.whenapp.presentation.fragment.MomentsMapFragment;
 import com.renefernandez.whenapp.presentation.fragment.PlaceholderFragment;
-import com.renefernandez.whenapp.presentation.fragment.MomentListFragment.ListFragmentItemClickListener;
-
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v4.view.ViewPager;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-
-//import android.app.FragmentManager;
-import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements
-		ActionBar.TabListener/*, ListFragmentItemClickListener*/{
+		ActionBar.TabListener{
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -152,9 +148,6 @@ public class MainActivity extends ActionBarActivity implements
 
 		@Override
 		public Fragment getItem(int position) {
-			// getItem is called to instantiate the fragment for the given page.
-			// Return a PlaceholderFragment (defined as a static inner class
-			// below).
 			
 			switch(position){
 			case 1:
@@ -188,22 +181,5 @@ public class MainActivity extends ActionBarActivity implements
 			return null;
 		}
 	}
-
-//	@Override
-//	public void onListFragmentItemClick(int position) {
-//		 
-//        // Getting the orientation ( Landscape or Portrait ) of the screen
-//        //int orientation = getResources().getConfiguration().orientation;
-// 
-//		// Portrait Mode or Square mode */
-//		// Creating an intent object to start the CountryDetailActivity
-//		Intent intent = new Intent(this, CountryDetailActivity.class);
-//
-//		// Setting data ( the clicked item's position ) to this intent
-//		intent.putExtra("position", position);
-//
-//		// Starting the activity by passing the implicit intent
-//		startActivity(intent);
-//    }
 
 }

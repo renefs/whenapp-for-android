@@ -1,7 +1,6 @@
 package com.renefernandez.whenapp.presentation.fragment;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import android.os.Bundle;
@@ -13,7 +12,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.renefernandez.whenapp.constants.Constants;
-import com.renefernandez.whenapp.constants.TestData;
 import com.renefernandez.whenapp.model.Moment;
 import com.renefernandez.whenapp.model.dao.MomentDao;
 
@@ -30,14 +28,8 @@ public class MomentsMapFragment extends SupportMapFragment {
 		Log.v("rene", "MomentsMapFragment: Oncreate");
 		
 		MomentDao dao = new MomentDao(this.getActivity());
-		//List<Moment> moments = dao.listAll();
-		//moment = TestData.getTestMoments()[b.getInt("position")];
 
-		// ArrayList<Parcelable> list =
-		// getArguments().getParcelableArrayList("markers");
 		List<Moment> list = dao.listAll();
-
-		// map = this.getMap();
 
 		markers = new ArrayList<MarkerOptions>(list.size());
 		for (Moment moment : list) {
@@ -52,10 +44,6 @@ public class MomentsMapFragment extends SupportMapFragment {
 					.title(moment.getTitle()));
 		}
 
-		/*
-		 * for (MarkerOptions marker : markers) { map.addMarker(marker); }
-		 */
-
 	}
 
 	@Override
@@ -69,11 +57,10 @@ public class MomentsMapFragment extends SupportMapFragment {
 				map.addMarker(marker);
 				currentMarker++;
 				if (currentMarker == markers.size()) {
-					// Move the camera instantly to hamburg with a zoom of 15.
+					
 					map.moveCamera(CameraUpdateFactory.newLatLngZoom(
 							marker.getPosition(), 12));
 
-					// Zoom in, animating the camera.
 					map.animateCamera(CameraUpdateFactory.zoomTo(12), 2000,
 							null);
 				}

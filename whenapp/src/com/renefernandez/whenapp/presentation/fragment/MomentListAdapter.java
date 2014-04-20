@@ -3,11 +3,7 @@ package com.renefernandez.whenapp.presentation.fragment;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import com.renefernandez.whenapp.R;
-import com.renefernandez.whenapp.model.Moment;
-
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -17,6 +13,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.renefernandez.whenapp.R;
+import com.renefernandez.whenapp.model.Moment;
 
 public class MomentListAdapter extends ArrayAdapter<Moment> {
 
