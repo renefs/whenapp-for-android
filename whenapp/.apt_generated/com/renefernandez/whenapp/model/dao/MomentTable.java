@@ -34,8 +34,8 @@ public class MomentTable extends TableHelper<Moment> {
 		IMAGE,
 		LATITUDE,
 		LONGITUDE,
-		THUMBNAIL,
-		TITLE
+		TITLE,
+		VIDEOPATH
 	}
 
 	@Override
@@ -72,8 +72,8 @@ public class MomentTable extends TableHelper<Moment> {
 				"IMAGE BLOB," +
 				"LATITUDE REAL," +
 				"LONGITUDE REAL," +
-				"THUMBNAIL BLOB," +
-				"TITLE TEXT" +
+				"TITLE TEXT," +
+				"VIDEOPATH TEXT" +
 			")";
 	}
 
@@ -97,8 +97,8 @@ public class MomentTable extends TableHelper<Moment> {
 		colIdx = c.getColumnIndex("IMAGE"); values[2] = (colIdx < 0) ? defaultValues[2] : BlobConverter.GET.toString(getBlobOrNull(c, colIdx));
 		colIdx = c.getColumnIndex("LATITUDE"); values[3] = (colIdx < 0) ? defaultValues[3] : DoubleConverter.GET.toString(getDoubleOrNull(c, colIdx));
 		colIdx = c.getColumnIndex("LONGITUDE"); values[4] = (colIdx < 0) ? defaultValues[4] : DoubleConverter.GET.toString(getDoubleOrNull(c, colIdx));
-		colIdx = c.getColumnIndex("THUMBNAIL"); values[5] = (colIdx < 0) ? defaultValues[5] : BlobConverter.GET.toString(getBlobOrNull(c, colIdx));
-		colIdx = c.getColumnIndex("TITLE"); values[6] = (colIdx < 0) ? defaultValues[6] : StringConverter.GET.toString(getStringOrNull(c, colIdx));
+		colIdx = c.getColumnIndex("TITLE"); values[5] = (colIdx < 0) ? defaultValues[5] : StringConverter.GET.toString(getStringOrNull(c, colIdx));
+		colIdx = c.getColumnIndex("VIDEOPATH"); values[6] = (colIdx < 0) ? defaultValues[6] : StringConverter.GET.toString(getStringOrNull(c, colIdx));
 		return values;
 	}
 
@@ -109,7 +109,7 @@ public class MomentTable extends TableHelper<Moment> {
 		if (rowValues[2] == null) insHelper.bindNull(3); else insHelper.bind(3, BlobConverter.GET.fromString(rowValues[2]));
 		if (rowValues[3] == null) insHelper.bindNull(4); else insHelper.bind(4, DoubleConverter.GET.fromString(rowValues[3]));
 		if (rowValues[4] == null) insHelper.bindNull(5); else insHelper.bind(5, DoubleConverter.GET.fromString(rowValues[4]));
-		if (rowValues[5] == null) insHelper.bindNull(6); else insHelper.bind(6, BlobConverter.GET.fromString(rowValues[5]));
+		if (rowValues[5] == null) insHelper.bindNull(6); else insHelper.bind(6, StringConverter.GET.fromString(rowValues[5]));
 		if (rowValues[6] == null) insHelper.bindNull(7); else insHelper.bind(7, StringConverter.GET.fromString(rowValues[6]));
 	}
 
@@ -122,8 +122,8 @@ public class MomentTable extends TableHelper<Moment> {
 		values[2] = BlobConverter.GET.toString(BlobConverter.GET.toSql(defaultObj.getImage()));
 		values[3] = DoubleConverter.GET.toString(DoubleConverter.GET.toSql(defaultObj.getLatitude()));
 		values[4] = DoubleConverter.GET.toString(DoubleConverter.GET.toSql(defaultObj.getLongitude()));
-		values[5] = BlobConverter.GET.toString(BlobConverter.GET.toSql(defaultObj.getThumbnail()));
-		values[6] = StringConverter.GET.toString(StringConverter.GET.toSql(defaultObj.getTitle()));
+		values[5] = StringConverter.GET.toString(StringConverter.GET.toSql(defaultObj.getTitle()));
+		values[6] = StringConverter.GET.toString(StringConverter.GET.toSql(defaultObj.getVideoPath()));
 		return values;
 	}
 
@@ -135,8 +135,8 @@ public class MomentTable extends TableHelper<Moment> {
 		obj.setImage(c.getBlob(2));
 		obj.setLatitude(DoubleConverter.GET.fromSql(getDoubleOrNull(c, 3)));
 		obj.setLongitude(DoubleConverter.GET.fromSql(getDoubleOrNull(c, 4)));
-		obj.setThumbnail(c.getBlob(5));
-		obj.setTitle(c.getString(6));
+		obj.setTitle(c.getString(5));
+		obj.setVideoPath(c.getString(6));
 		return obj;
 	}
 
@@ -148,8 +148,8 @@ public class MomentTable extends TableHelper<Moment> {
 		cv.put("IMAGE", obj.getImage());
 		cv.put("LATITUDE", DoubleConverter.GET.toSql(obj.getLatitude()));
 		cv.put("LONGITUDE", DoubleConverter.GET.toSql(obj.getLongitude()));
-		cv.put("THUMBNAIL", obj.getThumbnail());
 		cv.put("TITLE", obj.getTitle());
+		cv.put("VIDEOPATH", obj.getVideoPath());
 		return cv;
 	}
 
@@ -167,10 +167,10 @@ public class MomentTable extends TableHelper<Moment> {
 			filter = filter.eq(Columns.LATITUDE, DoubleConverter.GET.toSql(obj.getLatitude()));
 		if (obj.getLongitude() != defaultObj.getLongitude())
 			filter = filter.eq(Columns.LONGITUDE, DoubleConverter.GET.toSql(obj.getLongitude()));
-		if (obj.getThumbnail() != defaultObj.getThumbnail())
-			filter = filter.eq(Columns.THUMBNAIL, BlobConverter.GET.toSql(obj.getThumbnail()));
 		if (obj.getTitle() != defaultObj.getTitle())
 			filter = filter.eq(Columns.TITLE, StringConverter.GET.toSql(obj.getTitle()));
+		if (obj.getVideoPath() != defaultObj.getVideoPath())
+			filter = filter.eq(Columns.VIDEOPATH, StringConverter.GET.toSql(obj.getVideoPath()));
 		return filter;
 	}
 
