@@ -116,7 +116,7 @@ public class AddNewActivity extends ActionBarActivity implements
 
 		loadCalendarCurrentDate();
 
-		mVideoView.setVisibility(View.VISIBLE);
+		// mVideoView.setVisibility(View.VISIBLE);
 	}
 
 	private void loadInitialLocationOnMap(MapFragment mapFragment) {
@@ -187,7 +187,7 @@ public class AddNewActivity extends ActionBarActivity implements
 		int id = item.getItemId();
 
 		switch (id) {
-		
+
 		case R.id.action_save:
 
 			Toast.makeText(this.getBaseContext(), "Saving...",
@@ -226,6 +226,10 @@ public class AddNewActivity extends ActionBarActivity implements
 			newMoment.setImage(binaryImage);
 			Log.v("rene", "Imagen salvada");
 		}
+		
+		if(this.mVideoUri!=null)
+			newMoment.setVideoPath(this.getVideoPath());
+		
 		saveMomentInDatabase(newMoment);
 
 	}
@@ -438,15 +442,17 @@ public class AddNewActivity extends ActionBarActivity implements
 		mImageBitmap = savedInstanceState.getParcelable(BITMAP_STORAGE_KEY);
 		mVideoUri = savedInstanceState.getParcelable(VIDEO_STORAGE_KEY);
 		imageView.setImageBitmap(mImageBitmap);
-		imageView
-				.setVisibility(savedInstanceState
-						.getBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY) ? ImageView.VISIBLE
-						: ImageView.INVISIBLE);
+		/*
+		 * imageView .setVisibility(savedInstanceState
+		 * .getBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY) ? ImageView.VISIBLE :
+		 * ImageView.INVISIBLE);
+		 */
 		mVideoView.setVideoURI(mVideoUri);
-		mVideoView
-				.setVisibility(savedInstanceState
-						.getBoolean(VIDEOVIEW_VISIBILITY_STORAGE_KEY) ? ImageView.VISIBLE
-						: ImageView.INVISIBLE);
+		/*
+		 * mVideoView .setVisibility(savedInstanceState
+		 * .getBoolean(VIDEOVIEW_VISIBILITY_STORAGE_KEY) ? ImageView.VISIBLE :
+		 * ImageView.INVISIBLE);
+		 */
 
 		savedInstanceState.putString("title", this.textTitle.getText()
 				.toString());
@@ -622,8 +628,8 @@ public class AddNewActivity extends ActionBarActivity implements
 		/* Associate the Bitmap to the ImageView */
 		imageView.setImageBitmap(bitmap);
 		mVideoUri = null;
-		imageView.setVisibility(View.VISIBLE);
-		mVideoView.setVisibility(View.INVISIBLE);
+		// imageView.setVisibility(View.VISIBLE);
+		// mVideoView.setVisibility(View.INVISIBLE);
 	}
 
 	private void addPictureToGallery() {
@@ -681,8 +687,14 @@ public class AddNewActivity extends ActionBarActivity implements
 		mVideoUri = intent.getData();
 		mVideoView.setVideoURI(mVideoUri);
 		mImageBitmap = null;
-		mVideoView.setVisibility(View.VISIBLE);
-		imageView.setVisibility(View.INVISIBLE);
+		// mVideoView.setVisibility(View.VISIBLE);
+		// imageView.setVisibility(View.INVISIBLE);
+	}
+
+	public String getVideoPath() {
+
+		return this.mVideoUri.toString();
+
 	}
 
 }

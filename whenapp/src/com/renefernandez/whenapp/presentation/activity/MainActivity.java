@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.renefernandez.whenapp.R;
 import com.renefernandez.whenapp.presentation.fragment.MomentListFragment;
 import com.renefernandez.whenapp.presentation.fragment.MomentsMapFragment;
-import com.renefernandez.whenapp.presentation.fragment.PlaceholderFragment;
+import com.renefernandez.whenapp.presentation.fragment.HomeFragment;
 
 public class MainActivity extends ActionBarActivity implements
 		ActionBar.TabListener{
@@ -158,7 +158,7 @@ public class MainActivity extends ActionBarActivity implements
 
 			}		
 			
-			return PlaceholderFragment.newInstance(position + 1);
+			return HomeFragment.newInstance(position + 1);
 		}
 
 		@Override

@@ -11,8 +11,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.renefernandez.whenapp.R;
 import com.renefernandez.whenapp.model.Moment;
 import com.renefernandez.whenapp.model.dao.MomentDao;
+import com.renefernandez.whenapp.presentation.activity.AddNewActivity;
+import com.renefernandez.whenapp.presentation.activity.VideoActivity;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -24,7 +27,10 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class MomentDetailFragment extends Fragment {
@@ -71,6 +77,25 @@ public class MomentDetailFragment extends Fragment {
 		textViewTitle = (TextView) v.findViewById(R.id.textView1);
 		textViewDate = (TextView) v.findViewById(R.id.textView2);
 
+		LinearLayout mainLayout = (LinearLayout) v.findViewById(R.id.moment_detail_main);
+		
+		Button addNewButton = new Button(this.getActivity());
+		addNewButton.setText(R.string.view_video);
+		addNewButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(v.getContext(), VideoActivity.class);
+
+				intent.putExtra("path", moment.getVideoPath());
+				Log.v("rene", "Path: "+ moment.getVideoPath());
+				/** Starting the activity by passing the implicit intent */
+				startActivity(intent);
+
+			}
+		});
+		mainLayout.addView(addNewButton);
+		
 		return v;
 	}
 

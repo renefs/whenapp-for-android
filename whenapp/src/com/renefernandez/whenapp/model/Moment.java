@@ -11,7 +11,7 @@ public class Moment implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -4965065697188384250L;
+	private transient static final long serialVersionUID = -4965065697188384250L;
 
 	private long id;
 
@@ -21,7 +21,7 @@ public class Moment implements Serializable {
 	private Double longitude;
 
 	private byte[] image;
-	private byte[] thumbnail;
+	private String videoPath;
 
 	public Moment() {
 
@@ -91,12 +91,12 @@ public class Moment implements Serializable {
 		this.image = image;
 	}
 
-	public byte[] getThumbnail() {
-		return thumbnail;
+	public String getVideoPath() {
+		return videoPath;
 	}
 
-	public void setThumbnail(byte[] thumbnail) {
-		this.thumbnail = thumbnail;
+	public void setVideoPath(String videoPath) {
+		this.videoPath = videoPath;
 	}
 
 }
