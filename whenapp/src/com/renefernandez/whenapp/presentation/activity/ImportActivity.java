@@ -32,9 +32,15 @@ public class ImportActivity extends ActionBarActivity {
 			try {
 				InputStream input = getContentResolver().openInputStream(u);
 				ObjectInputStream in = new ObjectInputStream(input);
-				Moment newMoment = (Moment) in.readObject();
+				Moment importedMoment = (Moment) in.readObject();
 
-				Log.v("rene", "Moment: " + newMoment.getTitle());
+				Log.v("rene", "Moment: " + importedMoment.getTitle());
+
+				Moment newMoment = new Moment(importedMoment.getTitle())
+						.withDate(importedMoment.getDate()).withLocation(
+								importedMoment.getLatitude(),
+								importedMoment.getLongitude());
+				newMoment.setImage(importedMoment.getImage());
 
 				MomentDao dao = new MomentDao(this);
 

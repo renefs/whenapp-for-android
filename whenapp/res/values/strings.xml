@@ -10,7 +10,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_home">Home</string>
     <string name="title_activity_map">In a Map</string>
-    <string name="title_activity_list">Your Moments</string>
+    <string name="title_activity_list">Your Moment</string>
 
     <color name="blue">#5555ff</color>
 
@@ -43,6 +43,6 @@
     <string name="record_video">Record Video</string>
     <string name="no_moments">There are no moments yet. You can add your first moment pushing the following button.</string>
     <string name="title_activity_video">Your Video</string>
-    <string name="view_video">View Video</string>
+    <string name="view_video">Watch Video</string>
 
 </resources>

@@ -86,7 +86,7 @@ public class HomeFragment extends Fragment {
 		textViewHeader.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 25);
 		mainLayout.addView(textViewHeader);
 
-		if (moments.size() >= MAX_MOMENTS_TO_DISPLAY) {
+		if (moments.size() >= 0) {
 
 			for (int i = 0; (i < moments.size() && i < MAX_MOMENTS_TO_DISPLAY); i++) {
 

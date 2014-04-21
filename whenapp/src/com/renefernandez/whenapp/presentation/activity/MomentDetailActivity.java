@@ -4,16 +4,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Bitmap.Config;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,41 +24,91 @@ import android.os.Environment;
 import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.renefernandez.whenapp.R;
 import com.renefernandez.whenapp.model.Moment;
 import com.renefernandez.whenapp.model.dao.MomentDao;
-import com.renefernandez.whenapp.presentation.fragment.MomentDetailFragment;
 
 public class MomentDetailActivity extends ActionBarActivity {
 
-	private MomentDetailFragment detailsFragment;
 	private Long momentId;
+
+	private MapFragment mapFragment;
+	private ImageView imageView;
+	private TextView textViewTitle;
+	private TextView textViewDate;
+
+	private Drawable image;
+
+	private Moment moment;
+
+	private static String MOMENT_ID_ARGUMENT = "moment_id";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.moment_detail_activity);
-		FragmentManager fragmentManager = getFragmentManager();
-		FragmentTransaction fragmentTransacton = fragmentManager
-				.beginTransaction();
-		detailsFragment = new MomentDetailFragment();
 
-		Bundle b = new Bundle();
-		this.momentId = getIntent().getLongExtra("moment_id", 1);
+		this.momentId = getIntent().getLongExtra(MOMENT_ID_ARGUMENT, 1);
 
-		b.putLong("moment_id", momentId);
-		detailsFragment.setArguments(b);
+		MomentDao dao = new MomentDao(this);
 
-		fragmentTransacton.add(R.id.moment_detail_container, detailsFragment);
+		Log.v("rene", "moment_id received: " + momentId);
 
-		fragmentTransacton.commit();
+		moment = dao.get(momentId);
 
+		imageView = (ImageView) findViewById(R.id.imageView1);
+		mapFragment = (MapFragment) getFragmentManager().findFragmentById(
+				R.id.fragment1);
+		textViewTitle = (TextView) findViewById(R.id.textView1);
+		textViewDate = (TextView) findViewById(R.id.textView2);
+
+		addWatchVideoButton();
+
+	}
+
+	private void addWatchVideoButton() {
+		if (moment.getVideoPath() != null && !moment.getVideoPath().equals("")) {
+			LinearLayout mainLayout = (LinearLayout) 
+					findViewById(R.id.moment_detail_main);
+
+			Button watchVideo = new Button(this);
+			watchVideo.setText(R.string.view_video);
+			watchVideo.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(v.getContext(),
+							VideoActivity.class);
+
+					intent.putExtra("path", moment.getVideoPath());
+					Log.v("rene", "Path: " + moment.getVideoPath());
+
+					startActivity(intent);
+
+				}
+			});
+			mainLayout.addView(watchVideo);
+
+		}
 	}
 
 	@Override
@@ -80,14 +133,14 @@ public class MomentDetailActivity extends ActionBarActivity {
 
 			Toast.makeText(this.getBaseContext(), "Twitter", Toast.LENGTH_SHORT)
 					.show();
-			share("twitter", this.detailsFragment.getMoment().getImage());
+			share("twitter", getMoment().getImage());
 
 			return true;
 		case R.id.action_share_facebook:
 
 			Toast.makeText(this.getBaseContext(), "Facebook",
 					Toast.LENGTH_SHORT).show();
-			share("facebook", this.detailsFragment.getMoment().getImage());
+			share("facebook", getMoment().getImage());
 
 			return true;
 
@@ -130,8 +183,9 @@ public class MomentDetailActivity extends ActionBarActivity {
 			Uri u1 = Uri.fromFile(file);
 
 			Intent email = new Intent(Intent.ACTION_SEND);
-			email.putExtra(Intent.EXTRA_SUBJECT, "Your moment");
-			email.putExtra(Intent.EXTRA_TEXT, "Yout moment backup");
+			email.putExtra(Intent.EXTRA_SUBJECT, "Your Whenapp moment");
+			email.putExtra(Intent.EXTRA_TEXT,
+					"Your moment backup made with Whenapp for Android.");
 			email.putExtra(Intent.EXTRA_STREAM, u1);
 			email.setType("message/rfc822");
 
@@ -161,7 +215,7 @@ public class MomentDetailActivity extends ActionBarActivity {
 							|| info.activityInfo.name.toLowerCase(Locale.US)
 									.contains(nameApp)) {
 						targetedShare.putExtra(Intent.EXTRA_SUBJECT,
-								this.detailsFragment.getMoment().getTitle());
+								getMoment().getTitle());
 						targetedShare.putExtra(Intent.EXTRA_TEXT,
 								"via Whenapp for Android");
 
@@ -188,13 +242,13 @@ public class MomentDetailActivity extends ActionBarActivity {
 	}
 
 	private Uri getMomentBitmapUri() {
-		Bitmap bitmap = Bitmap.createBitmap(this.detailsFragment.getImage()
-				.getIntrinsicWidth(), this.detailsFragment.getImage()
+		Bitmap bitmap = Bitmap.createBitmap(getImage()
+				.getIntrinsicWidth(), getImage()
 				.getIntrinsicHeight(), Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
-		this.detailsFragment.getImage().setBounds(0, 0, canvas.getWidth(),
+		getImage().setBounds(0, 0, canvas.getWidth(),
 				canvas.getHeight());
-		this.detailsFragment.getImage().draw(canvas);
+		getImage().draw(canvas);
 
 		Uri bmpUri = null;
 		try {
@@ -211,6 +265,72 @@ public class MomentDetailActivity extends ActionBarActivity {
 			e.printStackTrace();
 		}
 		return bmpUri;
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		initMap();
+		initImageView();
+		initTitleTextView();
+		initDateTextView();
+	}
+
+	private void initDateTextView() {
+		textViewDate.setGravity(Gravity.CENTER);
+		SimpleDateFormat dt1 = new SimpleDateFormat("MM/dd/yyyy HH:mm",
+				Locale.ENGLISH);
+
+		textViewDate.setText(dt1.format(moment.getDate()));
+	}
+
+	private void initTitleTextView() {
+		textViewTitle.setGravity(Gravity.CENTER);
+		textViewTitle.setTextColor(Color.WHITE);
+		textViewTitle.setText(moment.getTitle());
+		textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 21);
+	}
+
+	private void initImageView() {
+		// Printing image in view
+		image = null;
+		if (moment.getImage() == null)
+			image = getResources().getDrawable(R.drawable.ph_350x200);
+		else {
+			image = new BitmapDrawable(this.getResources(),
+					BitmapFactory.decodeByteArray(moment.getImage(), 0,
+							moment.getImage().length));
+		}
+		imageView.setImageDrawable(image);
+	}
+
+	private void initMap() {
+		GoogleMap googleMap = mapFragment.getMap();
+
+		if (googleMap != null) {
+
+			googleMap.addMarker(new MarkerOptions()
+					.position(
+							new LatLng(moment.getLatitude(), moment
+									.getLongitude())).title(moment.getTitle())
+					.draggable(false));
+
+			googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
+					moment.getLatitude(), moment.getLongitude()), 14));
+
+			googleMap.animateCamera(CameraUpdateFactory.zoomTo(14), 2000, null);
+		} else {
+			Log.e("rene", "GoogleMap is null");
+		}
+	}
+
+	public Moment getMoment() {
+		return moment;
+	}
+
+	public Drawable getImage() {
+		return image;
 	}
 
 }

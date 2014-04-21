@@ -37,15 +37,15 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        <!--
-             IMAC: <meta-data
+        
+         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyDpT2u-0gX8jAZ6XlD7m1P7U1_QuOqFElU" />
-        -->
+        
 
-        <meta-data
+       <!-- Macbook: <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDq6aWb45mPOre-KTSd6_BmW4w5i96Xr2k" />
+            android:value="AIzaSyDq6aWb45mPOre-KTSd6_BmW4w5i96Xr2k" />-->
 
         <activity
             android:name="com.renefernandez.whenapp.presentation.activity.MainActivity"

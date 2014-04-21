@@ -45,6 +45,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -70,7 +72,9 @@ public class AddNewActivity extends ActionBarActivity implements
 	private static final int ACTION_TAKE_VIDEO = 3;
 
 	private static final String BITMAP_STORAGE_KEY = "viewbitmap";
+
 	private static final String IMAGEVIEW_VISIBILITY_STORAGE_KEY = "imageviewvisibility";
+	private static final String CURRENT_PHOTO_PATH = "currentPhotoPath";
 
 	private Bitmap mImageBitmap;
 
@@ -111,12 +115,21 @@ public class AddNewActivity extends ActionBarActivity implements
 
 		imageView = (ImageView) findViewById(R.id.imgView);
 		mVideoView = (VideoView) findViewById(R.id.videoView1);
+		Button videoButton = (Button) findViewById(R.id.button3);
+
+		videoButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Log.v("rene", "loadVideo: ACTION_TAKE_VIDEO");
+				dispatchTakeVideoIntent();
+
+			}
+		});
 
 		loadInitialLocationOnMap(mapFragment);
 
 		loadCalendarCurrentDate();
-
-		// mVideoView.setVisibility(View.VISIBLE);
 	}
 
 	private void loadInitialLocationOnMap(MapFragment mapFragment) {
@@ -226,10 +239,10 @@ public class AddNewActivity extends ActionBarActivity implements
 			newMoment.setImage(binaryImage);
 			Log.v("rene", "Imagen salvada");
 		}
-		
-		if(this.mVideoUri!=null)
+
+		if (this.mVideoUri != null)
 			newMoment.setVideoPath(this.getVideoPath());
-		
+
 		saveMomentInDatabase(newMoment);
 
 	}
@@ -344,14 +357,6 @@ public class AddNewActivity extends ActionBarActivity implements
 								dispatchLoadPictureIntent(ACTION_LOAD_IMAGE);
 							}
 
-						})
-				.setNeutralButton("Record video",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								Log.v("rene",
-										"displaySelectImageDialog: ACTION_TAKE_VIDEO");
-								dispatchTakeVideoIntent();
-							}
 						});
 
 		AlertDialog alertDialog = alertDialogBuilder.create();
@@ -439,21 +444,16 @@ public class AddNewActivity extends ActionBarActivity implements
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 
 		super.onRestoreInstanceState(savedInstanceState);
-		mImageBitmap = savedInstanceState.getParcelable(BITMAP_STORAGE_KEY);
-		mVideoUri = savedInstanceState.getParcelable(VIDEO_STORAGE_KEY);
-		imageView.setImageBitmap(mImageBitmap);
-		/*
-		 * imageView .setVisibility(savedInstanceState
-		 * .getBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY) ? ImageView.VISIBLE :
-		 * ImageView.INVISIBLE);
-		 */
-		mVideoView.setVideoURI(mVideoUri);
+
+		Log.v("rene", "onSaveInstance");
+
 		/*
 		 * mVideoView .setVisibility(savedInstanceState
 		 * .getBoolean(VIDEOVIEW_VISIBILITY_STORAGE_KEY) ? ImageView.VISIBLE :
 		 * ImageView.INVISIBLE);
 		 */
-
+		if (this.marker == null)
+			Log.v("rene", "el marcador es null");
 		savedInstanceState.putString("title", this.textTitle.getText()
 				.toString());
 		savedInstanceState
@@ -464,10 +464,21 @@ public class AddNewActivity extends ActionBarActivity implements
 				this.marker.getPosition().latitude);
 		savedInstanceState.putDouble("longitude",
 				this.marker.getPosition().longitude);
+
+		savedInstanceState.putParcelable(BITMAP_STORAGE_KEY, mImageBitmap);
+		savedInstanceState.putParcelable(VIDEO_STORAGE_KEY, mVideoUri);
+		savedInstanceState.putString(CURRENT_PHOTO_PATH, mCurrentPhotoPath);
+		savedInstanceState.putBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY,
+				(mImageBitmap != null));
+		savedInstanceState.putBoolean(VIDEOVIEW_VISIBILITY_STORAGE_KEY,
+				(mVideoUri != null));
 	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle b) {
+		super.onSaveInstanceState(b);
+
+		Log.v("rene", "onrestoreInstance");
 
 		if (b.getString("title") != null)
 			this.textTitle.setText(b.getString("title"));
@@ -482,11 +493,17 @@ public class AddNewActivity extends ActionBarActivity implements
 				new LatLng(b.getDouble("latitude"), b.getDouble("longitude")),
 				true);
 
-		b.putParcelable(BITMAP_STORAGE_KEY, mImageBitmap);
-		b.putParcelable(VIDEO_STORAGE_KEY, mVideoUri);
-		b.putBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY, (mImageBitmap != null));
-		b.putBoolean(VIDEOVIEW_VISIBILITY_STORAGE_KEY, (mVideoUri != null));
-		super.onSaveInstanceState(b);
+		mImageBitmap = b.getParcelable(BITMAP_STORAGE_KEY);
+		mVideoUri = b.getParcelable(VIDEO_STORAGE_KEY);
+		mCurrentPhotoPath = b.getString(CURRENT_PHOTO_PATH);
+		imageView.setImageBitmap(mImageBitmap);
+		/*
+		 * imageView .setVisibility(savedInstanceState
+		 * .getBoolean(IMAGEVIEW_VISIBILITY_STORAGE_KEY) ? ImageView.VISIBLE :
+		 * ImageView.INVISIBLE);
+		 */
+		mVideoView.setVideoURI(mVideoUri);
+		setPictureOnImageView();
 
 	}
 
@@ -627,7 +644,7 @@ public class AddNewActivity extends ActionBarActivity implements
 
 		/* Associate the Bitmap to the ImageView */
 		imageView.setImageBitmap(bitmap);
-		mVideoUri = null;
+		// mVideoUri = null;
 		// imageView.setVisibility(View.VISIBLE);
 		// mVideoView.setVisibility(View.INVISIBLE);
 	}
@@ -686,7 +703,7 @@ public class AddNewActivity extends ActionBarActivity implements
 	private void handleCameraVideo(Intent intent) {
 		mVideoUri = intent.getData();
 		mVideoView.setVideoURI(mVideoUri);
-		mImageBitmap = null;
+		// mImageBitmap = null;
 		// mVideoView.setVisibility(View.VISIBLE);
 		// imageView.setVisibility(View.INVISIBLE);
 	}

@@ -1,6 +1,0 @@
-:CONV_START
-:CONV_END
-:DB_START
-dbVersion=2,dbName=whenappDB,helperClass=com.renefernandez.whenapp.persistence.WhenappDatabaseHelper
-com.renefernandez.whenapp.model.dao.MomentTable
-:DB_END
