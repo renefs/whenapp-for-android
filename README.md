@@ -3,9 +3,7 @@ Whenapp for Android
 
 Aplicación realizada para la asignatura Desarrollo para Dispositivos Móviles del Máster de Ingeniería Web de UNIOVI.
 
-La entrega incluye el proyecto: "Whenapp for Android" y su APK.
-
-Se ha probado en un tablet Nexus 10 y funciona correctamente.
+Se ha probado en un tablet Nexus 10 con Android 4.4.2.
 
 Características de la aplicación:
 - Utilización de localización y mapas.
