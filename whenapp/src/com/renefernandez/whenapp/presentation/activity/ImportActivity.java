@@ -40,7 +40,7 @@ public class ImportActivity extends ActionBarActivity {
 						.withDate(importedMoment.getDate()).withLocation(
 								importedMoment.getLatitude(),
 								importedMoment.getLongitude());
-				newMoment.setImage(importedMoment.getImage());
+				//newMoment.setImagePath(importedMoment.getImagePath());
 
 				MomentDao dao = new MomentDao(this);
 

@@ -20,7 +20,7 @@ public class Moment implements Serializable {
 	private Double latitude;
 	private Double longitude;
 
-	private byte[] image;
+	private String imagePath;
 	private String videoPath;
 
 	public Moment() {
@@ -83,20 +83,20 @@ public class Moment implements Serializable {
 		this.id = id;
 	}
 
-	public byte[] getImage() {
-		return image;
-	}
-
-	public void setImage(byte[] image) {
-		this.image = image;
-	}
-
 	public String getVideoPath() {
 		return videoPath;
 	}
 
 	public void setVideoPath(String videoPath) {
 		this.videoPath = videoPath;
+	}
+
+	public String getImagePath() {
+		return imagePath;
+	}
+
+	public void setImagePath(String imagePath) {
+		this.imagePath = imagePath;
 	}
 
 }

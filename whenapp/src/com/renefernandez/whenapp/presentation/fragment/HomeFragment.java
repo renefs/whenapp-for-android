@@ -6,13 +6,13 @@ import java.util.Locale;
 
 import android.app.ActionBar.LayoutParams;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,6 +28,7 @@ import com.renefernandez.whenapp.model.Moment;
 import com.renefernandez.whenapp.model.dao.MomentDao;
 import com.renefernandez.whenapp.presentation.activity.AddNewActivity;
 import com.renefernandez.whenapp.presentation.activity.MomentDetailActivity;
+import com.renefernandez.whenapp.presentation.util.ImageHelper;
 
 public class HomeFragment extends Fragment {
 
@@ -109,43 +110,25 @@ public class HomeFragment extends Fragment {
 				imageView.setLayoutParams(new LayoutParams(190, 190));
 
 				Drawable img = null;
-				if (currentMoment.getImage() == null) {
+				if (currentMoment.getImagePath() == null) {
 					img = this.getActivity().getResources()
 							.getDrawable(R.drawable.android_logo);
-
+					img.setBounds(0, 0, 90, 90);
+					imageView.setImageDrawable(img);
 				} else {
 
-					/* Get the size of the ImageView */
-					int targetW = 90;
-					int targetH = 90;
+					Display display = this.getActivity().getWindowManager().getDefaultDisplay();
+					Point size = new Point();
+					display.getSize(size);
+					int width = size.x;
+					int height = size.y;
 
-					/* Get the size of the image */
-					BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-					bmOptions.inJustDecodeBounds = true;
-					// BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-					int photoW = 90;
-					int photoH = 90;
+					Log.v("rene", "Photow and photo H: " + width + " " + height);
 
-					/* Figure out which way needs to be reduced less */
-					int scaleFactor = 1;
-					if ((targetW > 0) || (targetH > 0)) {
-						scaleFactor = Math.min(photoW / targetW, photoH
-								/ targetH);
-					}
-
-					/* Set bitmap options to scale the image decode target */
-					bmOptions.inJustDecodeBounds = false;
-					bmOptions.inSampleSize = scaleFactor;
-					bmOptions.inPurgeable = true;
-
-					img = new BitmapDrawable(this.getActivity().getResources(),
-							BitmapFactory.decodeByteArray(
-									currentMoment.getImage(), 0,
-									currentMoment.getImage().length, bmOptions));
+					imageView.setImageBitmap(ImageHelper.decodeSampledBitmapFromPath(
+							currentMoment.getImagePath(), width / 2, height / 2));
 				}
-
-				img.setBounds(0, 0, 90, 90);
-				imageView.setImageDrawable(img);
+				
 				momentLayout.addView(imageView);
 
 				LinearLayout textLayout = new LinearLayout(this.getActivity());

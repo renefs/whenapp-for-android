@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -45,39 +46,39 @@ public class MomentListAdapter extends ArrayAdapter<Moment> {
  
 		System.out.println(s);
 		Drawable img =null;
-		if(values[position].getImage()==null){			
+		if(values[position].getImagePath()==null){			
 			img = getContext().getResources().getDrawable( R.drawable.android_logo );	
-			
+			img.setBounds( 0, 0, 90, 90 );
+			imageView.setImageDrawable(img);
 		}else{
 			
-			/* Get the size of the ImageView */
-			int targetW = 90;
-			int targetH = 90;
+			int targetW = imageView.getWidth();
+			int targetH = imageView.getHeight();
 
 			/* Get the size of the image */
 			BitmapFactory.Options bmOptions = new BitmapFactory.Options();
 			bmOptions.inJustDecodeBounds = true;
-			//BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-			int photoW = 90;
-			int photoH = 90;
-			
+			BitmapFactory.decodeFile(values[position].getImagePath(), bmOptions);
+			int photoW = bmOptions.outWidth;
+			int photoH = bmOptions.outHeight;
+
 			/* Figure out which way needs to be reduced less */
 			int scaleFactor = 1;
 			if ((targetW > 0) || (targetH > 0)) {
-				scaleFactor = Math.min(photoW/targetW, photoH/targetH);	
+				scaleFactor = Math.min(photoW / targetW, photoH / targetH);
 			}
-			
+
 			/* Set bitmap options to scale the image decode target */
 			bmOptions.inJustDecodeBounds = false;
 			bmOptions.inSampleSize = scaleFactor;
 			bmOptions.inPurgeable = true;
-			
-			//img= new BitmapDrawable(context.getResources(),BitmapFactory.decodeByteArray(values[position].getImage(), 0, values[position].getImage().length));
-			img = new BitmapDrawable(context.getResources(), BitmapFactory.decodeByteArray(values[position].getImage(), 0, values[position].getImage().length, bmOptions));
+
+			/* Decode the JPEG file into a Bitmap */
+			Bitmap bitmap = BitmapFactory.decodeFile(values[position].getImagePath(), bmOptions);
+
+			/* Associate the Bitmap to the ImageView */
+			imageView.setImageBitmap(bitmap);
 		}		
-		
-		img.setBounds( 0, 0, 90, 90 );
-		imageView.setImageDrawable(img);
 		
 		SimpleDateFormat dt1 = new SimpleDateFormat("MM/dd/yyyy HH:mm",Locale.ENGLISH);
 		

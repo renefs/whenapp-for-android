@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.Locale;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Bitmap.Config;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -25,6 +25,7 @@ import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,6 +46,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.renefernandez.whenapp.R;
 import com.renefernandez.whenapp.model.Moment;
 import com.renefernandez.whenapp.model.dao.MomentDao;
+import com.renefernandez.whenapp.presentation.util.DialogHelper;
+import com.renefernandez.whenapp.presentation.util.ImageHelper;
 
 public class MomentDetailActivity extends ActionBarActivity {
 
@@ -87,8 +90,7 @@ public class MomentDetailActivity extends ActionBarActivity {
 
 	private void addWatchVideoButton() {
 		if (moment.getVideoPath() != null && !moment.getVideoPath().equals("")) {
-			LinearLayout mainLayout = (LinearLayout) 
-					findViewById(R.id.moment_detail_main);
+			LinearLayout mainLayout = (LinearLayout) findViewById(R.id.moment_detail_main);
 
 			Button watchVideo = new Button(this);
 			watchVideo.setText(R.string.view_video);
@@ -133,14 +135,14 @@ public class MomentDetailActivity extends ActionBarActivity {
 
 			Toast.makeText(this.getBaseContext(), "Twitter", Toast.LENGTH_SHORT)
 					.show();
-			share("twitter", getMoment().getImage());
+			share("twitter", getMoment().getImagePath());
 
 			return true;
 		case R.id.action_share_facebook:
 
 			Toast.makeText(this.getBaseContext(), "Facebook",
 					Toast.LENGTH_SHORT).show();
-			share("facebook", getMoment().getImage());
+			share("facebook", getMoment().getImagePath());
 
 			return true;
 
@@ -198,7 +200,16 @@ public class MomentDetailActivity extends ActionBarActivity {
 
 	}
 
-	void share(String nameApp, byte[] image) {
+	void share(String nameApp, String imagePath) {
+
+		if (!isAppInstalled(nameApp)
+				&& !isAppInstalled("com." + nameApp + ".android")
+				&& !isAppInstalled("com." + nameApp + ".katana")) {
+			DialogHelper.displayAlertDialog("Error", "The selected app "
+					+ nameApp + " is not installed", this);
+			return;
+		}
+
 		try {
 			List<Intent> targetedShareIntents = new ArrayList<Intent>();
 			Intent share = new Intent(android.content.Intent.ACTION_SEND);
@@ -210,6 +221,11 @@ public class MomentDetailActivity extends ActionBarActivity {
 					Intent targetedShare = new Intent(
 							android.content.Intent.ACTION_SEND);
 					targetedShare.setType("image/jpeg");
+					Log.v("rene",
+							"TWITTER: "
+									+ (info.activityInfo.packageName
+											.toLowerCase(Locale.US)));
+
 					if (info.activityInfo.packageName.toLowerCase(Locale.US)
 							.contains(nameApp)
 							|| info.activityInfo.name.toLowerCase(Locale.US)
@@ -217,11 +233,10 @@ public class MomentDetailActivity extends ActionBarActivity {
 						targetedShare.putExtra(Intent.EXTRA_SUBJECT,
 								getMoment().getTitle());
 						targetedShare.putExtra(Intent.EXTRA_TEXT,
-								"via Whenapp for Android");
+								moment.getTitle() + " via Whenapp for Android");
 
-						Uri bmpUri = getMomentBitmapUri();
-
-						targetedShare.putExtra(Intent.EXTRA_STREAM, bmpUri);
+						targetedShare.putExtra(Intent.EXTRA_STREAM,
+								Uri.fromFile(new File(moment.getImagePath())));
 						targetedShare.setPackage(info.activityInfo.packageName);
 						targetedShareIntents.add(targetedShare);
 					}
@@ -242,12 +257,10 @@ public class MomentDetailActivity extends ActionBarActivity {
 	}
 
 	private Uri getMomentBitmapUri() {
-		Bitmap bitmap = Bitmap.createBitmap(getImage()
-				.getIntrinsicWidth(), getImage()
-				.getIntrinsicHeight(), Config.ARGB_8888);
+		Bitmap bitmap = Bitmap.createBitmap(getImage().getIntrinsicWidth(),
+				getImage().getIntrinsicHeight(), Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
-		getImage().setBounds(0, 0, canvas.getWidth(),
-				canvas.getHeight());
+		getImage().setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
 		getImage().draw(canvas);
 
 		Uri bmpUri = null;
@@ -295,14 +308,23 @@ public class MomentDetailActivity extends ActionBarActivity {
 	private void initImageView() {
 		// Printing image in view
 		image = null;
-		if (moment.getImage() == null)
+		if (moment.getImagePath() == null) {
 			image = getResources().getDrawable(R.drawable.ph_350x200);
-		else {
-			image = new BitmapDrawable(this.getResources(),
-					BitmapFactory.decodeByteArray(moment.getImage(), 0,
-							moment.getImage().length));
+			imageView.setImageDrawable(image);
+		} else {
+
+			Display display = getWindowManager().getDefaultDisplay();
+			Point size = new Point();
+			display.getSize(size);
+			int width = size.x;
+			int height = size.y;
+
+			Log.v("rene", "Photow and photo H: " + width + " " + height);
+
+			imageView.setImageBitmap(ImageHelper.decodeSampledBitmapFromPath(
+					moment.getImagePath(), width / 2, height / 2));
 		}
-		imageView.setImageDrawable(image);
+
 	}
 
 	private void initMap() {
@@ -331,6 +353,20 @@ public class MomentDetailActivity extends ActionBarActivity {
 
 	public Drawable getImage() {
 		return image;
+	}
+
+	
+
+	private boolean isAppInstalled(String packageName) {
+		PackageManager pm = getPackageManager();
+		boolean installed = false;
+		try {
+			pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
+			installed = true;
+		} catch (PackageManager.NameNotFoundException e) {
+			installed = false;
+		}
+		return installed;
 	}
 
 }

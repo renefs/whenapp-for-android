@@ -231,12 +231,12 @@ public class AddNewActivity extends ActionBarActivity implements
 					"The date format was incorrect.", this);
 		}
 
-		byte[] binaryImage = getByteArrayFromImage();
+		//byte[] binaryImage = getByteArrayFromImage();
 
 		Moment newMoment = new Moment(title).withDate(date).withLocation(
 				latitude, longitude);
-		if (binaryImage != null) {
-			newMoment.setImage(binaryImage);
+		if (mCurrentPhotoPath != null) {
+			newMoment.setImagePath(mCurrentPhotoPath);
 			Log.v("rene", "Imagen salvada");
 		}
 
@@ -695,7 +695,6 @@ public class AddNewActivity extends ActionBarActivity implements
 		if (mCurrentPhotoPath != null) {
 			setPictureOnImageView();
 			addPictureToGallery();
-			// mCurrentPhotoPath = null;
 		}
 
 	}
