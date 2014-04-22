@@ -17,6 +17,14 @@ import com.renefernandez.whenapp.model.Moment;
 import com.renefernandez.whenapp.model.dao.MomentDao;
 import com.renefernandez.whenapp.presentation.util.DialogHelper;
 
+/**
+ * Activity encargada de procesar la importación de los moments previamente
+ * exportados. Los archivos importados deben tener la extensión .wna y ser
+ * Moment (heredar de Serializable).
+ * 
+ * @author rene
+ * 
+ */
 public class ImportActivity extends ActionBarActivity {
 
 	@Override
@@ -40,7 +48,6 @@ public class ImportActivity extends ActionBarActivity {
 						.withDate(importedMoment.getDate()).withLocation(
 								importedMoment.getLatitude(),
 								importedMoment.getLongitude());
-				//newMoment.setImagePath(importedMoment.getImagePath());
 
 				MomentDao dao = new MomentDao(this);
 

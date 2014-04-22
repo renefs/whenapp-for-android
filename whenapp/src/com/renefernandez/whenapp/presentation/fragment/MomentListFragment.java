@@ -11,13 +11,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.renefernandez.whenapp.constants.Constants;
 import com.renefernandez.whenapp.model.Moment;
 import com.renefernandez.whenapp.model.dao.MomentDao;
 import com.renefernandez.whenapp.presentation.activity.MomentDetailActivity;
 
+/**
+ * Clase encargada de gestionar la pestaña de listado de Moments de la
+ * aplicación.
+ * 
+ * 
+ * @author rene
+ * 
+ */
 public class MomentListFragment extends ListFragment {
-	
+
 	private List<Moment> moments;
 
 	/** An interface for defining the callback method */
@@ -29,26 +36,31 @@ public class MomentListFragment extends ListFragment {
 		void onListFragmentItemClick(int position);
 	}
 
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
+
 		MomentDao dao = new MomentDao(this.getActivity());
 		moments = dao.listAll();
-		
-		setListAdapter(new MomentListAdapter(this.getActivity(), moments.toArray(new Moment[moments.size()])));
+
+		setListAdapter(new MomentListAdapter(this.getActivity(),
+				moments.toArray(new Moment[moments.size()])));
 
 		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
 	@Override
+	/**
+	 * Al hacer clic en un elemento del listado, se muestran los detalles del evento.
+	 * Para ello, se le pasa a la MomentDetailActivity el id del Moment seleccionado.
+	 */
 	public void onListItemClick(ListView l, View v, int position, long id) {
 
-		Intent intent = new Intent(this.getActivity(), MomentDetailActivity.class);
+		Intent intent = new Intent(this.getActivity(),
+				MomentDetailActivity.class);
 
-		Log.v("rene", "Moment ID: "+ moments.get(position).getId());
-	
+		Log.v("rene", "Moment ID: " + moments.get(position).getId());
+
 		intent.putExtra("moment_id", moments.get(position).getId());
 
 		startActivity(intent);
@@ -60,9 +72,6 @@ public class MomentListFragment extends ListFragment {
 	 */
 	public static MomentListFragment newInstance(int sectionNumber) {
 		MomentListFragment fragment = new MomentListFragment();
-		Bundle args = new Bundle();
-		args.putInt(Constants.ARG_SECTION_NUMBER, sectionNumber);
-		fragment.setArguments(args);
 		return fragment;
 	}
 

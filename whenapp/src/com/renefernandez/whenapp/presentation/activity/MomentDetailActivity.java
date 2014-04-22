@@ -2,7 +2,6 @@ package com.renefernandez.whenapp.presentation.activity;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,9 +11,6 @@ import java.util.Locale;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
@@ -88,6 +84,9 @@ public class MomentDetailActivity extends ActionBarActivity {
 
 	}
 
+	/**
+	 * Añade un botón para ver el vídeo si el Moment tiene uno asociado.
+	 */
 	private void addWatchVideoButton() {
 		if (moment.getVideoPath() != null && !moment.getVideoPath().equals("")) {
 			LinearLayout mainLayout = (LinearLayout) findViewById(R.id.moment_detail_main);
@@ -128,8 +127,8 @@ public class MomentDetailActivity extends ActionBarActivity {
 		switch (id) {
 
 		case R.id.action_settings:
-			Toast.makeText(this.getBaseContext(), "Settings",
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(this.getBaseContext(),
+					"René Fernández Sánchez - 2014", Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.action_share_twitter:
 
@@ -159,6 +158,15 @@ public class MomentDetailActivity extends ActionBarActivity {
 		}
 	}
 
+	/**
+	 * Exporta un archivo export.wna (previamente se ha creado una asociación de
+	 * este tipo de archivos con la aplicación en el Manifest) para serializar
+	 * el Moment actual y adjuntarlo en un correo electrónico.
+	 * 
+	 * Posteriormente el archivo exportado puede ser importado en la aplicación,
+	 * lo que añadirá un nuevo Moment. No se exportan las fotos ni los vídeos
+	 * para evitar problemas con la memoria de los dispositivos más modestos.
+	 */
 	private void shareByEmail() {
 
 		String filename = "export.wna";
@@ -200,6 +208,14 @@ public class MomentDetailActivity extends ActionBarActivity {
 
 	}
 
+	/**
+	 * Se utiliza para compartir en Twitter y en Facebook el Moment actual.
+	 * 
+	 * @param nameApp
+	 *            Nombre de la aplicación con la que se va a compartir.
+	 * @param imagePath
+	 *            Ruta de la imagen que se compartirá.
+	 */
 	void share(String nameApp, String imagePath) {
 
 		if (!isAppInstalled(nameApp)
@@ -256,30 +272,6 @@ public class MomentDetailActivity extends ActionBarActivity {
 		}
 	}
 
-	private Uri getMomentBitmapUri() {
-		Bitmap bitmap = Bitmap.createBitmap(getImage().getIntrinsicWidth(),
-				getImage().getIntrinsicHeight(), Config.ARGB_8888);
-		Canvas canvas = new Canvas(bitmap);
-		getImage().setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-		getImage().draw(canvas);
-
-		Uri bmpUri = null;
-		try {
-			File file = new File(
-					Environment
-							.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-					"share_image_" + System.currentTimeMillis() + ".png");
-			file.getParentFile().mkdirs();
-			FileOutputStream out = new FileOutputStream(file);
-			bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
-			out.close();
-			bmpUri = Uri.fromFile(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return bmpUri;
-	}
-
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -290,6 +282,9 @@ public class MomentDetailActivity extends ActionBarActivity {
 		initDateTextView();
 	}
 
+	/**
+	 * Incializa los campos de fecha
+	 */
 	private void initDateTextView() {
 		textViewDate.setGravity(Gravity.CENTER);
 		SimpleDateFormat dt1 = new SimpleDateFormat("MM/dd/yyyy HH:mm",
@@ -298,6 +293,9 @@ public class MomentDetailActivity extends ActionBarActivity {
 		textViewDate.setText(dt1.format(moment.getDate()));
 	}
 
+	/**
+	 * Inicializa el campo de título.
+	 */
 	private void initTitleTextView() {
 		textViewTitle.setGravity(Gravity.CENTER);
 		textViewTitle.setTextColor(Color.WHITE);
@@ -305,6 +303,9 @@ public class MomentDetailActivity extends ActionBarActivity {
 		textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 21);
 	}
 
+	/**
+	 * Inicializa la vista de imagen.
+	 */
 	private void initImageView() {
 		// Printing image in view
 		image = null;
@@ -327,6 +328,9 @@ public class MomentDetailActivity extends ActionBarActivity {
 
 	}
 
+	/**
+	 * Inicializa el mapa.
+	 */
 	private void initMap() {
 		GoogleMap googleMap = mapFragment.getMap();
 
@@ -355,8 +359,13 @@ public class MomentDetailActivity extends ActionBarActivity {
 		return image;
 	}
 
-	
-
+	/**
+	 * Comprueba que una aplicación está instalada en el dispositivo a través
+	 * del nombre de paquete.
+	 * 
+	 * @param packageName
+	 * @return
+	 */
 	private boolean isAppInstalled(String packageName) {
 		PackageManager pm = getPackageManager();
 		boolean installed = false;

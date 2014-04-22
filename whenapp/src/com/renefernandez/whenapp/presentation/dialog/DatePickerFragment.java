@@ -8,6 +8,11 @@ import android.app.Dialog;
 import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
 
+/**
+ * Utilizada para obtener la fecha dentro de un diálogo
+ * @author rene
+ *
+ */
 public class DatePickerFragment extends DialogFragment {
 	
 	public DatePickerFragment(){}

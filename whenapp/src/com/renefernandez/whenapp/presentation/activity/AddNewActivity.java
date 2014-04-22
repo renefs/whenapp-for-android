@@ -1,7 +1,5 @@
 package com.renefernandez.whenapp.presentation.activity;
 
-import java.io.ByteArrayOutputStream;
-
 import com.renefernandez.whenapp.business.pictures.*;
 
 import java.io.File;
@@ -56,11 +54,16 @@ import android.widget.VideoView;
 import android.provider.MediaStore;
 import android.provider.Settings;
 
+/**
+ * Activity encargada de añadir nuevos Moment a la base de datos.
+ * 
+ * @author rene
+ * 
+ */
 public class AddNewActivity extends ActionBarActivity implements
 		OnDateSetListener, OnTimeSetListener {
 
 	// MAP
-	// http://www.vogella.com/tutorials/AndroidGoogleMaps/article.html#maps_markers
 	static final LatLng EUITIO = new LatLng(43.35560534, -5.850938559);
 	private GoogleMap googleMap;
 	private Marker marker;
@@ -115,6 +118,18 @@ public class AddNewActivity extends ActionBarActivity implements
 
 		imageView = (ImageView) findViewById(R.id.imgView);
 		mVideoView = (VideoView) findViewById(R.id.videoView1);
+
+		setLoadVideoButtonClickListener();
+
+		loadInitialLocationOnMap(mapFragment);
+
+		loadCalendarCurrentDate();
+	}
+
+	/**
+	 * Establece un Listener para el botón de vídeo.
+	 */
+	private void setLoadVideoButtonClickListener() {
 		Button videoButton = (Button) findViewById(R.id.button3);
 
 		videoButton.setOnClickListener(new OnClickListener() {
@@ -126,12 +141,13 @@ public class AddNewActivity extends ActionBarActivity implements
 
 			}
 		});
-
-		loadInitialLocationOnMap(mapFragment);
-
-		loadCalendarCurrentDate();
 	}
 
+	/**
+	 * Establece la ubicación inicial en el mapa.
+	 * 
+	 * @param mapFragment
+	 */
 	private void loadInitialLocationOnMap(MapFragment mapFragment) {
 		if (mapFragment == null)
 			Log.e("AddNewActivity", "MAPFRAGMENT ES NULL");
@@ -153,6 +169,9 @@ public class AddNewActivity extends ActionBarActivity implements
 		}
 	}
 
+	/**
+	 * Establece la fecha actual en los campos de fecha y hora.
+	 */
 	private void loadCalendarCurrentDate() {
 		Calendar calendar = Calendar.getInstance();
 
@@ -214,6 +233,9 @@ public class AddNewActivity extends ActionBarActivity implements
 		}
 	}
 
+	/**
+	 * Crea un nuevo Moment y lo almacena en la base de datos.
+	 */
 	private void addNewMoment() {
 
 		if (!momentIsValid()) {
@@ -231,8 +253,6 @@ public class AddNewActivity extends ActionBarActivity implements
 					"The date format was incorrect.", this);
 		}
 
-		//byte[] binaryImage = getByteArrayFromImage();
-
 		Moment newMoment = new Moment(title).withDate(date).withLocation(
 				latitude, longitude);
 		if (mCurrentPhotoPath != null) {
@@ -247,6 +267,11 @@ public class AddNewActivity extends ActionBarActivity implements
 
 	}
 
+	/**
+	 * Almacena el Moment parámetro en la BD.
+	 * 
+	 * @param newMoment
+	 */
 	private void saveMomentInDatabase(Moment newMoment) {
 		MomentDao dao = new MomentDao(this);
 
@@ -268,6 +293,11 @@ public class AddNewActivity extends ActionBarActivity implements
 				Toast.LENGTH_SHORT).show();
 	}
 
+	/**
+	 * Obtiene la fecha de una cadena de texto.
+	 * 
+	 * @return
+	 */
 	private Date getDateFromString() {
 		SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy-hh:mm",
 				Locale.US);
@@ -288,22 +318,11 @@ public class AddNewActivity extends ActionBarActivity implements
 		return date;
 	}
 
-	private byte[] getByteArrayFromImage() {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-		byte[] img = null;
-		Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath);
-
-		if (bitmap != null) {
-			Log.v("rene", "Salvando imagen del moment");
-			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-			img = bos.toByteArray();
-		} else {
-			Log.e("rene", "La imagen es null");
-		}
-		return img;
-	}
-
+	/**
+	 * Comprueba que los datos del Moment son aptos para almacenarlo.
+	 * 
+	 * @return
+	 */
 	private boolean momentIsValid() {
 		// Precondiciones
 		if (this.textTitle.getText().toString() == null
@@ -334,6 +353,11 @@ public class AddNewActivity extends ActionBarActivity implements
 		return true;
 	}
 
+	/**
+	 * Muestra el selector de fuente de las imágenes.
+	 * 
+	 * @param view
+	 */
 	public void displaySelectImageDialog(View view) {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
@@ -354,7 +378,7 @@ public class AddNewActivity extends ActionBarActivity implements
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 
-								dispatchLoadPictureIntent(ACTION_LOAD_IMAGE);
+								dispatchLoadPictureIntent();
 							}
 
 						});
@@ -364,7 +388,10 @@ public class AddNewActivity extends ActionBarActivity implements
 		alertDialog.show();
 	}
 
-	private void dispatchLoadPictureIntent(int aCTION_LOAD_IMAGE) {
+	/**
+	 * Lanza el Intent de carga de imágenes
+	 */
+	private void dispatchLoadPictureIntent() {
 		Intent i = new Intent(Intent.ACTION_PICK,
 				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
@@ -372,11 +399,21 @@ public class AddNewActivity extends ActionBarActivity implements
 
 	}
 
+	/**
+	 * Muestra el diálogo de carga de fecha.
+	 * 
+	 * @param v
+	 */
 	public void showDatePickerDialog(View v) {
 		DialogFragment newFragment = new DatePickerFragment();
 		newFragment.show(getSupportFragmentManager(), "datePicker");
 	}
 
+	/**
+	 * Muestra el diálogo de carga de hora.
+	 * 
+	 * @param v
+	 */
 	public void showTimePickerDialog(View v) {
 		DialogFragment newFragment = new TimePickerFragment();
 		newFragment.show(getSupportFragmentManager(), "timePicker");
@@ -425,6 +462,11 @@ public class AddNewActivity extends ActionBarActivity implements
 		} // switch
 	}
 
+	/**
+	 * Gestiona la carga de imágenes desde la biblioteca.
+	 * 
+	 * @param data
+	 */
 	private void handleLoadPicture(Intent data) {
 		Uri selectedImage = data.getData();
 		String[] filePathColumn = { MediaStore.Images.Media.DATA };
@@ -447,11 +489,6 @@ public class AddNewActivity extends ActionBarActivity implements
 
 		Log.v("rene", "onSaveInstance");
 
-		/*
-		 * mVideoView .setVisibility(savedInstanceState
-		 * .getBoolean(VIDEOVIEW_VISIBILITY_STORAGE_KEY) ? ImageView.VISIBLE :
-		 * ImageView.INVISIBLE);
-		 */
 		if (this.marker == null)
 			Log.v("rene", "el marcador es null");
 		savedInstanceState.putString("title", this.textTitle.getText()
@@ -507,6 +544,11 @@ public class AddNewActivity extends ActionBarActivity implements
 
 	}
 
+	/**
+	 * En caso de que la localización esté desactivada, muestra un diálogo
+	 * indicando que se debe activar y redirige a Ajustes en caso de que sea
+	 * necesario.
+	 */
 	public void showGPSSettingsAlert() {
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 
@@ -540,6 +582,11 @@ public class AddNewActivity extends ActionBarActivity implements
 		alertDialog.show();
 	}
 
+	/**
+	 * Mueve el marcador de posición
+	 * @param position
+	 * @param withZoom
+	 */
 	private void setMarkerInPosition(LatLng position, boolean withZoom) {
 
 		if (marker == null) {
@@ -610,6 +657,9 @@ public class AddNewActivity extends ActionBarActivity implements
 		return f;
 	}
 
+	/**
+	 * Para evitar problemas de memoria es necesario redimensionar la imagen
+	 */
 	private void setPictureOnImageView() {
 
 		Log.v("rene", "setPic");
@@ -658,6 +708,10 @@ public class AddNewActivity extends ActionBarActivity implements
 		this.sendBroadcast(mediaScanIntent);
 	}
 
+	/**
+	 * Llama al Intent encargado de tomar fotografías.
+	 * @param actionCode
+	 */
 	private void dispatchTakePictureIntent(int actionCode) {
 
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -702,9 +756,6 @@ public class AddNewActivity extends ActionBarActivity implements
 	private void handleCameraVideo(Intent intent) {
 		mVideoUri = intent.getData();
 		mVideoView.setVideoURI(mVideoUri);
-		// mImageBitmap = null;
-		// mVideoView.setVisibility(View.VISIBLE);
-		// imageView.setVisibility(View.INVISIBLE);
 	}
 
 	public String getVideoPath() {

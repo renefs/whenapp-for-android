@@ -3,7 +3,11 @@ package com.renefernandez.whenapp.business.pictures;
 import java.io.File;
 
 import android.os.Environment;
-
+/**
+ * Devuelve la posición del álbum de fotos.
+ * @author rene
+ *
+ */
 public final class BaseAlbumDirFactory extends AlbumStorageDirFactory {
 
 	// Standard storage location for digital camera files

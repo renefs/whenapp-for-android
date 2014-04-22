@@ -21,6 +21,12 @@ import com.renefernandez.whenapp.presentation.fragment.MomentListFragment;
 import com.renefernandez.whenapp.presentation.fragment.MomentsMapFragment;
 import com.renefernandez.whenapp.presentation.fragment.HomeFragment;
 
+/**
+ * Actividad principal de la aplicación.
+ * Encargada de gestionar principalmente las pestañas de la app.
+ * @author rene
+ *
+ */
 public class MainActivity extends ActionBarActivity implements
 		ActionBar.TabListener{
 
@@ -100,7 +106,7 @@ public class MainActivity extends ActionBarActivity implements
         switch (id) {
         
         case R.id.action_settings:
-        	Toast.makeText(this.getBaseContext(), "Settings",
+        	Toast.makeText(this.getBaseContext(), "René Fernández Sánchez - 2014",
 					Toast.LENGTH_SHORT).show();
             return true;
         case R.id.action_new:

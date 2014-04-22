@@ -5,6 +5,13 @@ import java.util.Date;
 
 import com.turbomanage.storm.api.Entity;
 
+/**
+ * Entidad Moment. Se almacena en la base de datos y utiliza anotaciones del ORM
+ * Storm-Gen.
+ * 
+ * @author rene
+ * 
+ */
 @Entity
 public class Moment implements Serializable {
 

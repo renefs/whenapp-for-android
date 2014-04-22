@@ -8,6 +8,11 @@ import android.app.TimePickerDialog.OnTimeSetListener;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
+/**
+ * Utilizada para obtener horas y minutos dentro de un diálogo
+ * @author rene
+ *
+ */
 public class TimePickerFragment extends DialogFragment {
 
 	public TimePickerFragment() {

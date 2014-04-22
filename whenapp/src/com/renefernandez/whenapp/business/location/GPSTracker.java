@@ -12,7 +12,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
- 
+/**
+ * Clase utilizada para obtener la localización del usuario. 
+ * @author rene
+ *
+ */
 public class GPSTracker extends Service implements LocationListener {
  
     private final Context mContext;

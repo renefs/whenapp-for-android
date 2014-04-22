@@ -4,6 +4,11 @@ import java.io.File;
 
 import android.os.Environment;
 
+/**
+ * Devuelve la posición del directorio de almacenamiento para Froyo.
+ * @author rene
+ *
+ */
 public final class FroyoAlbumDirFactory extends AlbumStorageDirFactory {
 
 	@Override
